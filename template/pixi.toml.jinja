@@ -2,6 +2,7 @@
 channels = ["conda-forge"]
 platforms = ["linux-64"]
 preview = ["pixi-build"]
+requires-pixi = ">=0.82"
 
 [dependencies]
 {{package_name}} = { path = "." }
@@ -30,8 +31,18 @@ ignore-pypi-mapping = false
 # Add name mappings for packages not on conda-forge
 
 [feature.test.dependencies]
-pytest = "*"
-pytest-cov = "*"
+pytest = ">=9.1.1"
+pytest-cov = ">=7.1.0"
+
+# Solve to the lowest versions allowed by the dependency specs (see test-lowest below)
+[feature.lowest]
+solve-strategy = "lowest"
+
+# Data packages that should always be recent, even when testing lowest versions
+# (other packages depend on them without lower bounds)
+[feature.lowest.constraints]
+ca-certificates = ">=2026.10.18"
+tzdata = ">=2026c"
 
 [feature.dev.dependencies]
 rust = "*"
@@ -54,9 +65,12 @@ CARGO_TARGET_DIR = "$PIXI_PROJECT_ROOT/target/dev"
 default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default"}
 dev = { features = ["dev"], solve-group = "default"}
+# Test with the lowest versions allowed by the lower bounds on the dependencies
+test-lowest = { features = ["test", "lowest"] }
 
 [feature.test.tasks]
-test = "pytest"
+test = { cmd = "pytest", default-environment = "test" }
+test-lowest = { cmd = "pytest", default-environment = "test-lowest" }
 
 [feature.dev.tasks]
 # Manage pyproject.toml with uv

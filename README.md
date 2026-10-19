@@ -116,6 +116,13 @@ It then prints the commands to add your GitHub repository as a remote and push t
 Pushing triggers the test workflow, which you can check under the `Actions` tab of
 your GitHub repository.
 
+The init script also offers to set Pixi's
+[pinning strategy](https://pixi.prefix.dev/latest/reference/pixi_configuration/#pinning-strategy)
+to `latest-up` (for all your projects), so that `pixi add` adds lower bounds only,
+like `uv add`.
+These lower bounds are then checked by the `test-lowest` environment (see
+[below](#run-pre-commit-hooks)).
+
 For your first release, consider doing a [test release on Test PyPI](#publish-to-test-pypi).
 
 ### Usage
@@ -220,6 +227,9 @@ They run the following Pixi tasks, which you can also run individually:
 - `test-rs`: run Rust unit tests and doc tests with `cargo test`
 - `test`: run Python tests with `pytest`
 
+To also test with the lowest versions allowed by your dependencies' lower bounds, which
+CI does as well, run `pixi run test-lowest`.
+
 #### Release New Versions
 
 The following command shows the current version number.
@@ -244,6 +254,8 @@ Python package metadata, and the Rust code exposes it to Python as `__version__`
 When the tag is pushed, it triggers the
 [release workflow](template/.github/workflows/release.yml)
 on GitHub Actions, which runs the following jobs:
+
+- `test`: runs the test workflow, so that nothing is published unless the tests pass
 
 - `build-conda`: builds the Conda package with `pixi run build-conda`
   ([`pixi publish --target-dir dist`](https://pixi.prefix.dev/latest/reference/cli/pixi/publish/))
