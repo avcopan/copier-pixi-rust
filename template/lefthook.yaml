@@ -31,7 +31,11 @@ pre-commit:
     7-test-lowest:
       run: pixi run -e test-lowest test
 
-    8-check-clean:
+    8-workflows:
+      run: pixi run -e dev workflows
+      tags: [check]
+
+    9-check-clean:
       run: git diff --exit-code
       tags: [check]
 
@@ -44,6 +48,6 @@ pre-commit-local:
     <<: *pre-commit-commands
     1-local:
       run: pixi run -e dev local start
-    8-check-clean:
+    9-check-clean:
       run: git diff --exit-code
       skip: true  # local dependencies modify pixi.toml

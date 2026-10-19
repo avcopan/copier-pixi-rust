@@ -22,6 +22,7 @@ This is primarily for my own development.
 - Static typing with [Ty](https://github.com/astral-sh/ty)
 - Testing with `cargo test` and [PyTest](https://docs.pytest.org/en/latest/)
 - Code coverage with [PyTest-Cov](https://pytest-cov.readthedocs.io/en/latest/)
+- GitHub Actions workflow linting with [actionlint](https://github.com/rhysd/actionlint)
 - Git hooks with [LeftHook](https://lefthook.dev/)
 - Versioning and release triggering with [tbump](https://github.com/your-tools/tbump)
 - Continuous integration with [GitHub Actions](https://github.com/features/actions), including:
@@ -225,6 +226,8 @@ They run the following Pixi tasks, which you can also run individually:
   [pedantic](https://doc.rust-lang.org/clippy/lints.html) lint group, configured in
   `Cargo.toml`) and Python code with `ruff check`
 - `types`: type check Python code with `ty check`
+- `workflows`: lint the GitHub Actions workflows with
+  [actionlint](https://github.com/rhysd/actionlint)
 - `test-rs`: run Rust unit tests and doc tests with `cargo test`
 - `test`: run Python tests with `pytest`, with the newest compatible dependency versions
 - `test-lowest`: run Python tests with `pytest`, with the lowest versions allowed by your
@@ -307,7 +310,11 @@ This generates a project (once with and once without the Polars plugin) with
 runs its `pixi run init` and `pixi run pre-commit`, and then checks that the
 working tree is clean.
 This tests the setup and all pre-commit hooks of the generated project, including
-`test` and `test-lowest`.
+`test`, `test-lowest`, and `workflows`, which lints its GitHub Actions workflows.
+For the variant without the Polars plugin, the test then builds the conda package the
+same way the release workflow does.
+(The build is skipped with the plugin, because the optimized release build of Polars
+is slow, and the plugin's code is already built and tested by the pre-commit hooks.)
 Uncommitted changes to the template are included, so you can test changes before
 committing them.
 The test needs network access to install the project's environments.

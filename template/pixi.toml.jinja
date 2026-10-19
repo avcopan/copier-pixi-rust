@@ -50,6 +50,7 @@ uv = "*"
 ruff = "*"
 ty = "*"
 lefthook = "*"
+actionlint = "*"
 tbump = "*"
 ipykernel = "*"
 
@@ -85,6 +86,7 @@ fmt = "cargo fmt && ruff format ."
 lint = "cargo clippy --locked --all-targets --all-features -- -D warnings && ruff check . --fix"
 types = "ty check"
 test-rs = "cargo test --locked"
+workflows = "actionlint"  # lint the GitHub Actions workflows
 # Run pre-commit hooks (see lefthook.yaml)
 pre-commit = "lefthook run pre-commit --all-files"
 pre-commit-check = "lefthook run pre-commit --all-files --tag check"  # skips the tests
