@@ -42,7 +42,7 @@ Then install Copier as follows.
 pixi global install copier
 ```
 
-Optionally, you can also install `direnv` to automatically load your environment for you.
+Optionally, you can also install [direnv](https://direnv.net/docs/installation.html) to automatically load your environment for you.
 
 ### Setup
 
@@ -54,13 +54,17 @@ Use the following command to create a new project from this template.
 copier copy gh:avcopan/copier-pixi-rust <repo_name>
 ```
 
+Copier will prompt you for the package name and other settings.
+For `prefix_channel`, enter the prefix.dev channel to publish to (see
+[below](#prepare-remote-github-repository)), as `<namespace>` or
+`<namespace>/<channel>`.
 Answer "yes" to the Polars question if you want to set up a
 [Polars expression plugin](#polars-expression-plugins).
 
 #### Prepare Remote GitHub Repository
 
-Follow [these instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository) to create an empty remote repository on GitHub using the same name as above.
-Then complete the following configurations, which are needed by the release workflow.
+Follow [these instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository) to create an empty remote repository on GitHub (without a README, license, or `.gitignore`), using `<repo_name>` from above as its name.
+Then set up package publication as follows, which is needed by the release workflow.
 
 **Package publication.**
 The release workflow publishes packages using
@@ -70,8 +74,8 @@ Instead, you tell each package index once that your repository's `release.yml`
 workflow is allowed to publish to it.
 
 - **Conda (prefix.dev).**
-  Create a channel on [prefix.dev](https://prefix.dev/), if you do not have one yet,
-  and then follow
+  Create a channel on [prefix.dev](https://prefix.dev/), if you do not have one yet
+  (this is the `prefix_channel` from above), and then follow
   [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
   to add Repository Access for GitHub, using the workflow filename `release.yml` and
   the Read/write mode.
@@ -79,19 +83,22 @@ workflow is allowed to publish to it.
   Follow
   [these instructions](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
   to add a pending publisher on both [PyPI](https://pypi.org/) and
-  [Test PyPI](https://test.pypi.org/), using the workflow name `release.yml`.
+  [Test PyPI](https://test.pypi.org/), using your package name as the project name
+  and the workflow name `release.yml`.
 - **crates.io.**
-  Unlike the others, crates.io requires the crate to exist before Trusted Publishing
-  can be set up, so the first version must be published once from your computer with
-  an API token (created under `Account Settings > API Tokens` on
-  [crates.io](https://crates.io/)):
+  crates.io requires the crate to exist before Trusted Publishing can be set up, so
+  after [initializing your repository](#initialize-local-repository), publish its
+  initial `0.0.0` version once from your computer.
+  Create an API token with the `publish-new` scope under `Account Settings > API Tokens`
+  on [crates.io](https://crates.io/), and run the following.
   ```sh
   pixi run -e dev cargo login     # paste the token when prompted
   pixi run publish-crates
+  pixi run -e dev cargo logout
   ```
   Then follow [these instructions](https://crates.io/docs/trusted-publishing) to add a
-  GitHub publisher, using the workflow filename `release.yml`, after which you can
-  delete the token.
+  GitHub publisher, using the workflow filename `release.yml`, and delete the token.
+  Your releases will then be published to crates.io by the release workflow.
   If you do not want to publish to crates.io, delete the `publish-crates` job from
   [`release.yml`](template/.github/workflows/release.yml) and remove it from the
   `needs` list of the `release` job.
@@ -106,6 +113,10 @@ This creates a Git repository, installs all Pixi environments (which builds your
 package for the first time and creates the `Cargo.lock` file), makes an initial
 commit, and installs the Git hooks.
 It then prints the commands to add your GitHub repository as a remote and push to it.
+Pushing triggers the test workflow, which you can check under the `Actions` tab of
+your GitHub repository.
+
+For your first release, consider doing a [test release on Test PyPI](#publish-to-test-pypi).
 
 ### Usage
 
@@ -197,6 +208,8 @@ pixi run pre-commit         # run pre-commit hooks
 pixi run local-pre-commit   # run pre-commit hooks with local dependencies
 ```
 These pre-commit hooks are [configured and run](https://lefthook.dev/configuration/run.html) using LeftHook.
+To temporarily disable them, for example to make a work-in-progress commit, run
+`pixi run hooks off` (and `pixi run hooks on` to re-enable them).
 They run the following Pixi tasks, which you can also run individually:
 
 - `fmt`: format Rust code with `cargo fmt` and Python code with `ruff format`
@@ -215,12 +228,15 @@ pixi run version
 ```
 Once you decide the appropriate next version number according to
 [SemVer](https://semver.org/)
-semantics, you can trigger a release by running this command.
+semantics, describe your changes under the `[Unreleased]` heading in `CHANGELOG.md`,
+following the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+Then trigger a release by running this command.
 ```sh
 pixi run release <new version number>
 ```
-This updates the version in `Cargo.toml` and `pixi.toml`, updates `CHANGELOG.md`,
-`Cargo.lock`, and `pixi.lock`, and creates a release commit tagged with the new
+This updates the version in `Cargo.toml` and `pixi.toml`, turns the `[Unreleased]`
+section of `CHANGELOG.md` into an entry for the new version, updates `Cargo.lock` and
+`pixi.lock`, and creates a release commit tagged with the new
 version number, then pushes both the commit and the tag to GitHub.
 (The version in `Cargo.toml` is the single source of truth: maturin passes it to the
 Python package metadata, and the Rust code exposes it to Python as `__version__`.)
@@ -253,6 +269,19 @@ pixi run publish-test-pypi  #      <-- uncomment for test release
 ```
 No other changes are needed, as long as you have added a pending publisher on Test PyPI
 as described [above](#prepare-remote-github-repository).
+Remember to swap the lines back before your first real release.
+
+### Updating Against Template Changes
+
+To update your project against changes to this template, run the following in a
+clean working tree.
+```sh
+copier update
+```
+Copier re-applies your saved answers (stored in `.copier-answers.yml`) to the latest
+version of the template and merges the changes into your project.
+See [these instructions](https://copier.readthedocs.io/en/stable/updating/) for
+details, including how to resolve conflicts.
 
 ### How It Works
 

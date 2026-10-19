@@ -30,11 +30,9 @@ fi
 # Install git hooks with lefthook
 lefthook install
 
-USER=$(git config --global user.name)
 REPO=$(basename "$PWD")
 echo "Setup complete."
 echo
 echo "Now, run the following commands to set up your remote repository:"
-echo "  git remote add origin git@github.com:$USER/$REPO.git"
+echo "  git remote add origin git@github.com:{{github_org_name}}/$REPO.git"
 echo "  git push -u origin main"
-echo "(Double-check the URL to make sure the user/org and repo names are what you want.)"
