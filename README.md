@@ -212,7 +212,8 @@ If you have initialized with `pixi run init`, the pre-commit hooks should run wi
 You can also run them directly as follows.
 ```sh
 pixi run pre-commit         # run pre-commit hooks
-pixi run local-pre-commit   # run pre-commit hooks with local dependencies
+pixi run pre-commit-check   # run pre-commit hooks, except the tests
+pixi run pre-commit-local   # run pre-commit hooks with local dependencies
 ```
 These pre-commit hooks are [configured and run](https://lefthook.dev/configuration/run.html) using LeftHook.
 To temporarily disable them, for example to make a work-in-progress commit, run
@@ -225,10 +226,9 @@ They run the following Pixi tasks, which you can also run individually:
   `Cargo.toml`) and Python code with `ruff check`
 - `types`: type check Python code with `ty check`
 - `test-rs`: run Rust unit tests and doc tests with `cargo test`
-- `test`: run Python tests with `pytest`
-
-To also test with the lowest versions allowed by your dependencies' lower bounds, which
-CI does as well, run `pixi run test-lowest`.
+- `test`: run Python tests with `pytest`, with the newest compatible dependency versions
+- `test-lowest`: run Python tests with `pytest`, with the lowest versions allowed by your
+  dependencies' lower bounds
 
 #### Release New Versions
 

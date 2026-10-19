@@ -8,7 +8,7 @@ on:
   workflow_call:  # allows the release workflow to run the tests first
 
 jobs:
-  test:
+  pre-commit-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,13 +20,32 @@ jobs:
       - uses: prefix-dev/setup-pixi@v0.11.2
         with:
           cache: true
-          environments: dev test test-lowest
+          environments: dev test
 
-      - name: Run pre-commit hooks
-        run: pixi run pre-commit
+      - name: Run pre-commit hooks, except the tests (run below)
+        run: pixi run pre-commit-check
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # report results for every environment
+      matrix:
+        # test: highest compatible dependency versions
+        # test-lowest: lowest versions allowed by the lower bounds
+        environment: [test, test-lowest]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # Cache Rust build artifacts in target/ to speed up compilation
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.environment }}  # separate cache for each environment
+
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          cache: true
+          environments: ${{ matrix.environment }}
 
       - name: Run tests with coverage report
-        run: pixi run test
-
-      - name: Run tests with lowest dependency versions
-        run: pixi run test-lowest
+        run: pixi run -e ${{ matrix.environment }} test
