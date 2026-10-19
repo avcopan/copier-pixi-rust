@@ -1,0 +1,29 @@
+# Rust build artifacts
+/target
+
+# Compiled Python extension modules (placed in python/ by editable builds)
+*.so
+*.pyd
+
+# Python caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Test coverage reports
+.coverage
+htmlcov/
+
+# Distribution packages
+dist/
+*.conda
+
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+# Local environment stashes
+.pixi_local_true
+.pixi_local_false
+.pixi_local_true.lock
+.pixi_local_false.lock

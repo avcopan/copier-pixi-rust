@@ -1,0 +1,67 @@
+[project]
+name = "{{package_name}}"
+dynamic = ["version"]  # taken from Cargo.toml by maturin
+description = "{{description}}"
+authors = [{name = "{{author_name}}", email = "{{author_email}}"}]
+dependencies = [{% if polars_plugin %}"polars"{% endif %}]
+requires-python = ">= 3.13"
+
+[build-system]
+build-backend = "maturin"
+requires = ["maturin>=1.9,<2"]
+
+# Maturin configurations
+[tool.maturin]
+module-name = "{{package_name}}._core"  # compile the Rust code as a private submodule
+python-source = "python"                # directory containing the Python package
+features = ["python"]                   # enable the Python bindings (see Cargo.toml)
+editable-profile = "dev"                # fast, unoptimized builds for local development
+
+# Ruff configurations
+[tool.ruff]
+src = ["python"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",   # missing trailing comma (handled by format)
+    "TID252",   # relative import
+    "D203",     # conflict: incorrect blank line before class (uses D211 instead)
+    "D213",     # conflict: multi-line summary second line (uses D212 instead)
+    "CPY001",   # copyright notice
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**.py" = ["S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# Ty configurations
+[tool.ty.environment]
+python = ".pixi/envs/test/bin/python"
+
+[tool.ty.src]
+include = [
+    "python",
+    "tests",
+]
+
+# Pytest configurations
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--cov={{package_name}}",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+# Pytest-cov configurations
+[tool.coverage.run]
+branch = true
+source = ["{{package_name}}"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80

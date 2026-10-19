@@ -1,0 +1,31 @@
+_subdirectory: template
+
+# questions
+package_name:
+  type: str
+  help: Package name
+
+description:
+  type: str
+  help: Short package description (required by crates.io)
+
+author_name:
+  type: str
+  help: Author name
+
+author_email:
+  type: str
+  help: Author email
+
+github_org_name:
+  type: str
+  help: GitHub username or organization
+
+prefix_channel:
+  type: str
+  help: prefix.dev channel (e.g. <namespace> or <namespace>/<channel>)
+
+polars_plugin:
+  type: bool
+  help: Include a Polars expression plugin?
+  default: false

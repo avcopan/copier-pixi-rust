@@ -1,0 +1,93 @@
+[workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+preview = ["pixi-build"]
+
+[dependencies]
+{{package_name}} = { path = "." }
+
+[package]
+name = "{{package_name}}"
+version = "0.0.0"
+
+[package.build.backend]
+name = "pixi-build-python"
+version = "*"
+
+[package.build.config]
+# Build a single package for all Python versions >= requires-python (Python stable ABI)
+abi3 = true
+# The Rust compiler is detected from maturin, but listing it here is what makes Pixi
+# rebuild the package when *.rs or Cargo.toml files change
+compilers = ["rust"]
+# Also rebuild when Cargo.lock changes, but not for generated files in target/
+extra-input-globs = ["Cargo.lock", "!target/**"]
+# Map dependencies in pyproject.toml to Conda packages
+ignore-pyproject-manifest = false
+ignore-pypi-mapping = false
+
+[package.build.config.pypi-conda-map]
+# Add name mappings for packages not on conda-forge
+
+[feature.test.dependencies]
+pytest = "*"
+pytest-cov = "*"
+
+[feature.dev.dependencies]
+rust = "*"
+uv = "*"
+ruff = "*"
+ty = "*"
+lefthook = "*"
+tbump = "*"
+ipykernel = "*"
+
+[feature.dev.pypi-dependencies]
+keepachangelog = "*"
+
+[feature.dev.activation.env]
+# Keep dev-environment Cargo builds separate from Pixi package builds, which use a
+# different Rust toolchain and would otherwise keep invalidating each other's cache
+CARGO_TARGET_DIR = "$PIXI_PROJECT_ROOT/target/dev"
+
+[environments]
+default = { solve-group = "default" }
+test = { features = ["test"], solve-group = "default"}
+dev = { features = ["dev"], solve-group = "default"}
+
+[feature.test.tasks]
+test = "pytest"
+
+[feature.dev.tasks]
+# Manage pyproject.toml with uv
+uv = "uv"
+add = "uv add"
+remove = "uv remove"
+# Local dependency management (see scripts/local.sh)
+local = "./scripts/local.sh"
+# Individual tasks for pre-commit hooks (must be added to lefthook.yaml)
+fmt = "cargo fmt && ruff format ."
+lint = "cargo clippy --locked --all-targets --all-features -- -D warnings && ruff check . --fix"
+types = "ty check"
+test-rs = "cargo test --locked"
+# Run pre-commit hooks (see lefthook.yaml)
+pre-commit = "lefthook run pre-commit --all-files"
+local-pre-commit = "lefthook run local-pre-commit --all-files"
+# Build and publish conda package
+build-conda = "pixi publish --target-dir dist"
+publish-conda = "pixi upload prefix --channel {{prefix_channel}} dist/*.conda"
+# Publish PyPI package (wheels are built by the release workflow)
+publish-pypi = "uv publish"
+publish-test-pypi = "uv publish --publish-url https://test.pypi.org/legacy/"
+# Publish crate to crates.io
+publish-crates = "cargo publish --locked"
+# Initiate release
+version = "tbump current-version"
+{% raw -%}
+changelog = { cmd = "keepachangelog release {{ version }}", args=["version"] }
+{%- endraw %}
+release = "tbump"
+# Toggle Git hooks on/off
+hooks = "./scripts/hooks.sh"
+# Setup and initialize this repository (only run once)
+init = { cmd = "./scripts/init.sh" }

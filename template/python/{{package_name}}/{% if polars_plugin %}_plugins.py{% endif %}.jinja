@@ -1,0 +1,26 @@
+"""Polars expression plugins (see src/expressions.rs)."""
+
+from pathlib import Path
+
+import polars as pl
+from polars.plugins import register_plugin_function
+
+# Polars loads the plugin functions from the compiled Rust library in this directory
+PLUGIN_PATH = Path(__file__).parent
+
+
+def greet_expr(expr: pl.Expr | str) -> pl.Expr:
+    """Greet each name in a string column.
+
+    Args:
+        expr: A string column, given as an expression or a column name.
+
+    Returns:
+        An expression giving a greeting for each name.
+    """
+    return register_plugin_function(
+        plugin_path=PLUGIN_PATH,
+        function_name="greet_expr",
+        args=expr,
+        is_elementwise=True,
+    )

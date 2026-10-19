@@ -1,0 +1,11 @@
+use polars::prelude::*;
+use pyo3_polars::derive::polars_expr;
+
+/// Greet each name in a string column.
+#[polars_expr(output_type=String)]
+fn greet_expr(inputs: &[Series]) -> PolarsResult<Series> {
+    let names = inputs[0].str()?;
+    let out: StringChunked =
+        names.apply_into_string_amortized(|name, output| output.push_str(&crate::greet(name)));
+    Ok(out.into_series())
+}
