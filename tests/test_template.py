@@ -37,7 +37,9 @@ def run(cwd: Path, *args: str, gitconfig: Path) -> str:
     return result.stdout
 
 
-@pytest.mark.parametrize("polars_plugin", [False, True])
+@pytest.mark.parametrize(
+    "polars_plugin", [False, True], ids=["plain", "polars"]  # ids are used by test.yml
+)
 def test_template(tmp_path: Path, polars_plugin: bool) -> None:
     gitconfig = tmp_path / "gitconfig"
     gitconfig.write_text("[user]\n  name = Test\n  email = test@example.com\n")

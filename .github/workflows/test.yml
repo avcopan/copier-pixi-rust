@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # report results for both variants
+      matrix:
+        # Test the generated project without and with the Polars plugin, in parallel
+        variant: [plain, polars]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Copier warns when generating from a shallow clone
+
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          cache: true
+
+      - name: Generate a project and run its setup and pre-commit hooks
+        run: pixi run test -k ${{ matrix.variant }}
