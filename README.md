@@ -295,6 +295,23 @@ version of the template and merges the changes into your project.
 See [these instructions](https://copier.readthedocs.io/en/stable/updating/) for
 details, including how to resolve conflicts.
 
+### Testing the Template
+
+The template itself is tested by [`tests/test_template.py`](tests/test_template.py),
+which runs as follows.
+```sh
+pixi run test
+```
+This generates a project (once with and once without the Polars plugin) with
+[Copier's Python API](https://copier.readthedocs.io/en/stable/reference/main/),
+runs its `pixi run init` and `pixi run pre-commit`, and then checks that the
+working tree is clean.
+This tests the setup and all pre-commit hooks of the generated project, including
+`test` and `test-lowest`.
+Uncommitted changes to the template are included, so you can test changes before
+committing them.
+The test needs network access to install the project's environments.
+
 ### How It Works
 
 This section explains the parts of the setup that are not self-explanatory.

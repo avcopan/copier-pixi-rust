@@ -6,5 +6,10 @@ platforms = ["linux-64"]
 version = "0.1.0"
 
 [tasks]
+# Generate a project and run its setup and pre-commit hooks (see tests/)
+test = "pytest"
 
 [dependencies]
+python = ">=3.13"
+copier = ">=9.19"
+pytest = ">=9.1"
