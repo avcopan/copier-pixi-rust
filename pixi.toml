@@ -8,16 +8,27 @@ version = "0.0.1"
 [tasks]
 # Generate a project and run its setup and pre-commit hooks (see tests/)
 test = "pytest"
+# Individual tasks for pre-commit hooks (must be added to lefthook.yaml)
+fmt = "ruff format tests"
+lint = "ruff check tests --fix"
+workflows = "actionlint"  # lint the GitHub Actions workflows
+# Run pre-commit hooks (see lefthook.yaml)
+pre-commit = "lefthook run pre-commit --all-files"
 # Initiate release
 version = "tbump current-version"
 changelog = { cmd = "keepachangelog release {{ version }}", args=["version"] }
 release = "tbump"
+# Toggle Git hooks on/off
+hooks = "./scripts/hooks.sh"
 
 [dependencies]
 python = ">=3.13"
 copier = ">=9.19"
 pytest = ">=9.1"
 tbump = "*"
+ruff = "*"
+actionlint = "*"
+lefthook = "*"
 
 [pypi-dependencies]
 keepachangelog = "*"

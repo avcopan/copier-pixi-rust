@@ -330,6 +330,29 @@ The test needs network access to install the project's environments.
 The [test workflow](.github/workflows/test.yml) runs this test on GitHub Actions for
 every push to the template repository, with both variants in parallel.
 
+### Checking the Template
+
+The template repository has its own pre-commit hooks, which are configured in
+[`lefthook.yaml`](lefthook.yaml).
+After cloning the repository, install them once as follows.
+```sh
+pixi run lefthook install
+```
+They run the following Pixi tasks, followed by a check that the working tree is clean:
+
+- `fmt`: format the template test with `ruff format`
+- `lint`: lint the template test with `ruff check`
+- `workflows`: lint the GitHub Actions workflows with
+  [actionlint](https://github.com/rhysd/actionlint)
+
+Ruff only checks `tests/`, since the Python files in `template/` are checked in the
+generated project by the template test.
+The hooks do not run the template test itself, because it is slow.
+You can also run them directly with `pixi run pre-commit`, and temporarily disable them
+with `pixi run hooks off` (and re-enable them with `pixi run hooks on`).
+The [test workflow](.github/workflows/test.yml) runs them on GitHub Actions for every
+push to the template repository.
+
 ### Releasing the Template
 
 The template is versioned and released in the same way as the generated projects (see

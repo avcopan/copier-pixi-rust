@@ -1,0 +1,17 @@
+# Commands are run in the order of their names
+pre-commit:
+  parallel: false
+  exclude:
+    - .pixi/
+  commands:
+    1-fmt:
+      run: pixi run fmt
+
+    2-lint:
+      run: pixi run lint
+
+    3-workflows:
+      run: pixi run workflows
+
+    4-check-clean:
+      run: git diff --exit-code

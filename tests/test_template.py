@@ -30,7 +30,13 @@ def run(cwd: Path, *args: str, gitconfig: Path) -> str:
     }
     env["GIT_CONFIG_GLOBAL"] = str(gitconfig)
     result = subprocess.run(
-        args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        args,
+        check=False,  # checked below, after printing the output
+        cwd=cwd,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
     )
     print(result.stdout)  # shown by pytest if the test fails
     result.check_returncode()
@@ -38,7 +44,9 @@ def run(cwd: Path, *args: str, gitconfig: Path) -> str:
 
 
 @pytest.mark.parametrize(
-    "polars_plugin", [False, True], ids=["plain", "polars"]  # ids are used by test.yml
+    "polars_plugin",
+    [False, True],
+    ids=["plain", "polars"],  # ids are used by test.yml
 )
 def test_template(tmp_path: Path, polars_plugin: bool) -> None:
     gitconfig = tmp_path / "gitconfig"

@@ -8,6 +8,19 @@ on:
   workflow_call:  # allows the release workflow to run the tests first
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          cache: true
+
+      - name: Run pre-commit hooks
+        run: pixi run pre-commit
+
   test:
     runs-on: ubuntu-latest
     strategy:
