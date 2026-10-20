@@ -11,6 +11,7 @@ TEMPLATE = Path(__file__).parents[1]
 
 ANSWERS = {
     "package_name": "mypkg",
+    "repo_name": "mypkg",
     "description": "A test package",
     "author_name": "Jane Doe",
     "author_email": "jane@example.com",
@@ -66,6 +67,9 @@ def test_template(tmp_path: Path, polars_plugin: bool) -> None:
     # Note: if direnv is installed, this also runs `direnv allow` on the temporary project
     run(project, "pixi", "run", "init", gitconfig=gitconfig)
     run(project, "pixi", "run", "pre-commit", gitconfig=gitconfig)
+    # Build the documentation site, like the docs workflow (whose deploy step needs GitHub)
+    run(project, "pixi", "run", "docs-build", gitconfig=gitconfig)
+    assert (project / "great-docs" / "_site" / "index.html").exists()
     # Build the conda package, like the release workflow (whose other steps need GitHub).
     # This is a slow release build, and the Polars plugin only adds dependencies, which
     # the pre-commit hooks have already built and tested, so build only without it.

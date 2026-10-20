@@ -45,17 +45,31 @@ ca-certificates = ">=2026.10.18"
 tzdata = ">=2026c"
 
 [feature.dev.dependencies]
+# Rust toolchain
 rust = "*"
+# Type stub generation
+maturin = ">=1.15"
+# Dependency management
 uv = "*"
+# Formatting, linting, and pre-commit hooks
 ruff = "*"
 ty = "*"
 lefthook = "*"
 actionlint = "*"
+# Releases
 tbump = "*"
+# Template updates
+copier = "*"
+# Notebooks
 ipykernel = "*"
+# Documentation (see great-docs.yml)
+quarto = ">=1.9.38"
 
 [feature.dev.pypi-dependencies]
+# Releases
 keepachangelog = "*"
+# Documentation
+great-docs = ">=0.17.0"
 
 [feature.dev.activation.env]
 # Keep dev-environment Cargo builds separate from Pixi package builds, which use a
@@ -82,6 +96,7 @@ local = "./scripts/local.sh"
 # Run the tests with the lowest dependency versions (see test-lowest environment)
 test-lowest = "pixi run -e test-lowest test"
 # Individual tasks for pre-commit hooks (must be added to lefthook.yaml)
+stubs = "maturin generate-stubs --out python && ruff format python/{{package_name}}/_core.pyi"  # see src/python.rs
 fmt = "cargo fmt && ruff format ."
 lint = "cargo clippy --locked --all-targets --all-features -- -D warnings && ruff check . --fix"
 types = "ty check"
@@ -91,6 +106,9 @@ workflows = "actionlint"  # lint the GitHub Actions workflows
 pre-commit = "lefthook run pre-commit --all-files"
 pre-commit-check = "lefthook run pre-commit --all-files --tag check"  # skips the tests
 pre-commit-local = "lefthook run pre-commit-local --all-files"
+# Build and preview documentation (see great-docs.yml)
+docs-build = "great-docs build"
+docs-preview = { cmd = "great-docs preview", depends-on = ["docs-build"] }
 # Build and publish conda package
 build-conda = "pixi publish --target-dir dist"
 publish-conda = "pixi upload prefix --channel {{prefix_channel}} dist/*.conda"
@@ -105,6 +123,8 @@ version = "tbump current-version"
 changelog = { cmd = "keepachangelog release {{ version }}", args=["version"] }
 {%- endraw %}
 release = "tbump"
+# Update against template changes (see scripts/copier-update.sh)
+copier-update = "./scripts/copier-update.sh"
 # Toggle Git hooks on/off
 hooks = "./scripts/hooks.sh"
 # Setup and initialize this repository (only run once)

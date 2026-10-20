@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Documentation with Great Docs: `pixi run docs-build` and `pixi run docs-preview` build and preview the site, configured in `great-docs.yml`, and a docs workflow deploys it to GitHub Pages on every push to `main`
+- The Great Docs agent skills (from great-docs v0.17.0) in `.claude/skills/`
+- A `repo_name` question, used for `[project.urls]` in `pyproject.toml` (which adds links to the GitHub repository in the documentation site) and for `repository` in `Cargo.toml`
+- A `pixi run copier-update` task, which runs `copier update` and commits the update if there are no conflicts, or else prints the conflicted files, the commands to commit, and a vimdiff cheat sheet
+- `pixi run init` offers to set Git's merge tool to vimdiff, and ends with a reminder to link the documentation site under "About" on GitHub
+- A pre-commit hook that fails on unresolved merge conflict markers and lists where they are (also for the template repository)
+- A `pixi run stubs` task and pre-commit hook that generate the type stub of the compiled module (`_core.pyi`) from the Rust code, with PyO3's `experimental-inspect` feature and `maturin generate-stubs`
+
+### Changed
+
+- `_core.pyi` is now generated instead of hand-written, and includes docstrings (from the doc comments in `src/python.rs`, which are now in Google docstring style)
+- `__version__` is exported with `#[pymodule_export]` instead of a `#[pymodule_init]` function, so that the generated stub is complete
+
 ## [0.0.2] - 2026-10-20
 
 ### Added

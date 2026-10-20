@@ -5,37 +5,49 @@ pre-commit:
   exclude:
     - .pixi/
   commands: &pre-commit-commands
+    0-conflicts:
+      run: |
+        if git grep -n -E '^(<<<<<<<|>>>>>>>)( |$)'; then
+          echo "Error: unresolved merge conflict markers (listed above)"
+          exit 1
+        fi
+      tags: [check]
+
     1-local:
       run: pixi run -e dev local stop
       tags: [check]
 
-    2-fmt:
+    2-stubs:
+      run: pixi run -e dev stubs
+      tags: [check]
+
+    3-fmt:
       run: pixi run -e dev fmt
       tags: [check]
 
-    3-lint:
+    4-lint:
       run: pixi run -e dev lint
       tags: [check]
 
-    4-types:
+    5-types:
       run: pixi run -e dev types
       tags: [check]
 
-    5-test-rs:
+    6-test-rs:
       run: pixi run -e dev test-rs
       tags: [check]
 
-    6-test:
+    7-test:
       run: pixi run -e test test
 
-    7-test-lowest:
+    8-test-lowest:
       run: pixi run -e test-lowest test
 
-    8-workflows:
+    9-workflows:
       run: pixi run -e dev workflows
       tags: [check]
 
-    9-check-clean:
+    10-check-clean:
       run: git diff --exit-code
       tags: [check]
 
@@ -48,6 +60,6 @@ pre-commit-local:
     <<: *pre-commit-commands
     1-local:
       run: pixi run -e dev local start
-    9-check-clean:
+    10-check-clean:
       run: git diff --exit-code
       skip: true  # local dependencies modify pixi.toml

@@ -1,3 +1,6 @@
+# Merge tool backups
+*.orig
+
 # Rust build artifacts
 /target
 
@@ -30,3 +33,12 @@ dist/
 .pixi_local_false
 .pixi_local_true.lock
 .pixi_local_false.lock
+
+# Great Docs build directory (ephemeral, do not commit)
+/great-docs/
+
+# Great Docs versioned-build artifacts
+_great_docs_build/
+.great-docs-build/
+.great-docs-cache/
+.great-docs/

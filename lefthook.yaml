@@ -4,6 +4,13 @@ pre-commit:
   exclude:
     - .pixi/
   commands:
+    0-conflicts:
+      run: |
+        if git grep -n -E '^(<<<<<<<|>>>>>>>)( |$)'; then
+          echo "Error: unresolved merge conflict markers (listed above)"
+          exit 1
+        fi
+
     1-fmt:
       run: pixi run fmt
 

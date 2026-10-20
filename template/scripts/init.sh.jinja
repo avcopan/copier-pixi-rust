@@ -46,9 +46,27 @@ if ! pixi config list pinning-strategy --json | grep -q '"latest-up"'; then
   echo
 fi
 
-REPO=$(basename "$PWD")
+# Offer to use vimdiff as Git's merge tool, e.g. for conflicts from `pixi run copier-update`
+if [[ -z "$(git config --global merge.tool || true)" ]]; then
+  MERGE_CMD="git config --global merge.tool vimdiff"
+  if [[ -t 0 ]]; then
+    read -r -p "Set Git's merge tool to vimdiff for all your projects? [Y/n] " answer
+  else
+    answer=n
+  fi
+  if [[ "${answer:-y}" =~ ^[Yy] ]]; then
+    $MERGE_CMD
+  else
+    echo "To set Git's merge tool later, run: $MERGE_CMD"
+  fi
+  echo
+fi
+
 echo "Setup complete."
 echo
 echo "Now, run the following commands to set up your remote repository:"
-echo "  git remote add origin git@github.com:{{github_org_name}}/$REPO.git"
+echo "  git remote add origin git@github.com:{{github_org_name}}/{{repo_name}}.git"
 echo "  git push -u origin main"
+echo
+echo "Then, link your documentation site under 'About' on your GitHub repository site"
+echo "(see https://github.com/avcopan/copier-pixi-rust#initialize-local-repository)."

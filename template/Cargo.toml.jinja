@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2024"
 description = "{{description}}"
 license = "MIT"
-repository = "https://github.com/{{github_org_name}}/{{package_name}}"
+repository = "https://github.com/{{github_org_name}}/{{repo_name}}"
 # Files to include when publishing to crates.io (the Python package is not needed there)
 include = ["/src", "/Cargo.toml", "/Cargo.lock", "/README.md", "/LICENSE"]
 
@@ -19,8 +19,9 @@ crate-type = ["cdylib", "rlib"]
 python = ["dep:pyo3"{% if polars_plugin %}, "dep:pyo3-polars", "dep:polars"{% endif %}]
 
 [dependencies]
-# Python-only dependencies are optional and enabled by the `python` feature above
-pyo3 = { version = "0.29", features = ["abi3-py313"], optional = true }
+# Python-only dependencies are optional and enabled by the `python` feature above.
+# PyO3's experimental-inspect feature lets maturin generate the type stubs (see pixi.toml).
+pyo3 = { version = "0.29", features = ["abi3-py313", "experimental-inspect"], optional = true }
 {%- if polars_plugin %}
 pyo3-polars = { version = "0.28", features = ["derive"], optional = true }
 polars = { version = "0.55", default-features = false, optional = true }

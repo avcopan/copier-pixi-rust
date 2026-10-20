@@ -14,6 +14,11 @@ package_name:
   help: Package name
   validator: "{% if not package_name.isidentifier() or package_name != package_name.lower() %}Use lowercase letters, digits, and underscores, starting with a letter{% endif %}"
 
+repo_name:
+  type: str
+  help: GitHub repository name
+  default: "{{ package_name }}"
+
 description:
   type: str
   help: Short package description (required by crates.io)

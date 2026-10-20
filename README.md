@@ -19,14 +19,18 @@ This is primarily for my own development.
 - Packaging and release for PyPI with [maturin-action](https://github.com/PyO3/maturin-action) and [UV](https://docs.astral.sh/uv/)
 - Packaging and release for [crates.io](https://crates.io/) with Cargo
 - Formatting and linting with [rustfmt](https://github.com/rust-lang/rustfmt), [Clippy](https://doc.rust-lang.org/clippy/), and [Ruff](https://github.com/charliermarsh/ruff)
-- Static typing with [Ty](https://github.com/astral-sh/ty)
+- Static typing with [Ty](https://github.com/astral-sh/ty), with Python type stubs generated from the Rust code by PyO3 and maturin
 - Testing with `cargo test` and [PyTest](https://docs.pytest.org/en/latest/)
 - Code coverage with [PyTest-Cov](https://pytest-cov.readthedocs.io/en/latest/)
 - GitHub Actions workflow linting with [actionlint](https://github.com/rhysd/actionlint)
 - Git hooks with [LeftHook](https://lefthook.dev/)
 - Versioning and release triggering with [tbump](https://github.com/your-tools/tbump)
+- Documentation with [Great Docs](https://posit-dev.github.io/great-docs/), including auto-generated API reference
+- Documentation hosting on [GitHub Pages](https://docs.github.com/en/pages)
+- Great Docs [agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html) for [Claude Code](https://code.claude.com/docs/en/skills)
 - Continuous integration with [GitHub Actions](https://github.com/features/actions), including:
   - Linting, formatting, testing, etc.
+  - Deploying the documentation site
   - Publishing Conda (prefix.dev), PyPI, and crates.io packages, using Trusted Publishing
   - Creating releases
 
@@ -56,6 +60,8 @@ copier copy gh:avcopan/copier-pixi-rust <repo_name>
 ```
 
 Copier will prompt you for the package name and other settings.
+For `repo_name`, enter the name of your GitHub repository (by default, the package
+name), which is used for the links to your repository and documentation site.
 For `prefix_channel`, enter the prefix.dev channel to publish to (see
 [below](#prepare-remote-github-repository)), as `<namespace>` or
 `<namespace>/<channel>`.
@@ -64,8 +70,13 @@ Answer "yes" to the Polars question if you want to set up a
 
 #### Prepare Remote GitHub Repository
 
-Follow [these instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository) to create an empty remote repository on GitHub (without a README, license, or `.gitignore`), using `<repo_name>` from above as its name.
-Then set up package publication as follows, which is needed by the release workflow.
+Follow [these instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository) to create an empty remote repository on GitHub (without a README, license, or `.gitignore`), using `repo_name` from above as its name.
+Then complete the following configurations, which are needed by the GitHub Actions workflows.
+
+**Documentation.**
+To enable deploying your documentation site, navigate to `Settings > Pages` on your
+GitHub repository site and set the `Source` for your GitHub Pages deployment to
+"GitHub Actions".
 
 **Package publication.**
 The release workflow publishes packages using
@@ -110,21 +121,33 @@ You are now ready to initialize your local repository by running the following.
 ```sh
 pixi run init
 ```
-This creates a Git repository, installs all Pixi environments (which builds your
-package for the first time and creates the `Cargo.lock` file), makes an initial
-commit, and installs the Git hooks.
-It then prints the commands to add your GitHub repository as a remote and push to it.
-Pushing triggers the test workflow, which you can check under the `Actions` tab of
-your GitHub repository.
+This does the following:
 
-The init script also offers to set Pixi's
-[pinning strategy](https://pixi.prefix.dev/latest/reference/pixi_configuration/#pinning-strategy)
-to `latest-up` (for all your projects), so that `pixi add` adds lower bounds only,
-like `uv add`.
-These lower bounds are then checked by the `test-lowest` environment (see
-[below](#run-pre-commit-hooks)).
+- Installs all Pixi environments (which builds your package for the first time and
+  creates the `Cargo.lock` file)
+- Creates a Git repository with an initial commit, and installs the [Git hooks](#run-pre-commit-hooks)
+- Asks whether to set some of your global configurations, such as Pixi's
+  [pinning strategy](https://pixi.prefix.dev/latest/reference/pixi_configuration/#pinning-strategy)
+  and Git's [merge tool](https://git-scm.com/docs/git-mergetool)
+- Prints the commands to push your project to GitHub
 
-For your first release, consider doing a [test release on Test PyPI](#publish-to-test-pypi).
+Then complete the following steps.
+
+1. **Push to GitHub.**
+   Run the commands printed at the end, which add your GitHub repository as a remote and push to it.
+   This triggers the test and docs workflows, which you can check under the `Actions` tab of your
+   GitHub repository.
+2. **Link your documentation site.**
+   Navigate to your GitHub repository site and click the gear icon next to `About`.
+   Check the box under `Website` that says "Use your GitHub Pages website".
+   This makes it easy to navigate to your documentation site from GitHub.
+   The site lives at `https://<github_org_name>.github.io/<repo_name>/` and gets updated
+   by the docs workflow on every push to `main`.
+3. **Publish to crates.io once.**
+   Publish the initial version of your crate and set up Trusted Publishing for it, as
+   described [above](#prepare-remote-github-repository).
+4. **Before your first release.**
+   Consider doing a [test release on Test PyPI](#publish-to-test-pypi).
 
 ### Usage
 
@@ -137,21 +160,26 @@ The Rust code lives in [`src/`](template/src/), as for any Rust project:
   unit test and a doc test.
 - [`src/python.rs`](template/src/python.rs) defines the Python bindings: a
   `#[pymodule]` named `_core` that wraps Rust functions with `#[pyfunction]`.
+  Their doc comments become the Python docstrings, so they are written in Python's
+  (Google) docstring style.
 
 The Python package lives in [`python/<package_name>/`](template/python/{{package_name}}/):
 
 - [`__init__.py`](template/python/{{package_name}}/__init__.py.jinja) re-exports the
   public functions from the compiled `_core` module.
   Any Python-only code you need can be added next to it.
-- [`_core.pyi`](template/python/{{package_name}}/_core.pyi) is a hand-written type stub
-  describing the compiled module, so that Ty, Ruff, and editors know its signatures.
-  **Whenever you add or change a `#[pyfunction]`, update this file to match.**
+- [`_core.pyi`](template/python/{{package_name}}/_core.pyi) is a type stub describing
+  the compiled module, so that Ty, Great Docs, and editors know its signatures and
+  docstrings.
+  It is generated from `src/python.rs` by `pixi run stubs`, which the pre-commit hooks
+  run for you (see [below](#type-stubs)), so do not edit it by hand.
 - [`py.typed`](template/python/{{package_name}}/py.typed) is an empty marker telling
   type checkers that the package ships type information.
 
 To expose a new Rust function to Python, you therefore (1) write the Rust function,
-(2) wrap it in `src/python.rs`, (3) add it to `_core.pyi`, and (4) re-export it in
-`__init__.py`.
+(2) wrap it in `src/python.rs`, and (3) re-export it in `__init__.py`.
+The type stub is updated when you commit (or run `pixi run stubs` to update it right
+away).
 
 #### Manage Rust Dependencies
 
@@ -217,10 +245,14 @@ pixi run pre-commit-check   # run pre-commit hooks, except the tests
 pixi run pre-commit-local   # run pre-commit hooks with local dependencies
 ```
 These pre-commit hooks are [configured and run](https://lefthook.dev/configuration/run.html) using LeftHook.
+They start by checking for unresolved merge conflict markers (e.g. from
+[template updates](#updating-against-template-changes)), listing where they are.
 To temporarily disable them, for example to make a work-in-progress commit, run
 `pixi run hooks off` (and `pixi run hooks on` to re-enable them).
 They run the following Pixi tasks, which you can also run individually:
 
+- `stubs`: generate the type stub of the compiled module (`_core.pyi`) with
+  `maturin generate-stubs`
 - `fmt`: format Rust code with `cargo fmt` and Python code with `ruff format`
 - `lint`: lint Rust code with `cargo clippy` (with the
   [pedantic](https://doc.rust-lang.org/clippy/lints.html) lint group, configured in
@@ -232,6 +264,45 @@ They run the following Pixi tasks, which you can also run individually:
 - `test`: run Python tests with `pytest`, with the newest compatible dependency versions
 - `test-lowest`: run Python tests with `pytest`, with the lowest versions allowed by your
   dependencies' lower bounds
+
+The hooks end by checking that the working tree is clean, so they fail if, for example,
+the committed type stub is out of date (just commit the updated files).
+
+#### Edit Documentation
+
+The documentation site can be built and previewed locally as follows.
+```sh
+pixi run docs-preview
+```
+This builds the site into `great-docs/_site/` and serves it at
+<http://localhost:3000>.
+To only build the site, run `pixi run docs-build`.
+The [docs workflow](template/.github/workflows/docs.yml) builds and deploys the site
+on every push to the `main` branch.
+
+The site is built with [Great Docs](https://posit-dev.github.io/great-docs/), and
+configured in the `great-docs.yml` file.
+This is the default configuration written by `great-docs init`, which lists every
+option, commented out at its default value, with this template's presets set (e.g.
+`pypi: false`, which removes the link to PyPI).
+The API reference is generated from your package's public Python API, which you can
+organize in its `reference` section (see
+[here](https://posit-dev.github.io/great-docs/user-guide/api-documentation.html)).
+For functions from the compiled module, the descriptions come from the doc comments in
+`src/python.rs`, and the types from `_core.pyi`.
+The links to your GitHub repository come from `[project.urls]` in `pyproject.toml`.
+You can add user guide pages as `.qmd` files in a `user_guide/` directory, as
+described
+[here](https://posit-dev.github.io/great-docs/user-guide/user-guides.html).
+For everything else, see the
+[Great Docs user guide](https://posit-dev.github.io/great-docs/user-guide/introduction.html).
+
+The project also includes the Great Docs
+[agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html)
+in `.claude/skills/`, which teach Claude Code how to configure the site, write user
+guide pages, and revise docstrings.
+These are copied from the Great Docs release that this template targets, and are
+updated with the template.
 
 #### Release New Versions
 
@@ -291,18 +362,26 @@ Remember to swap the lines back before your first real release.
 To update your project against changes to this template, run the following in a
 clean working tree.
 ```sh
-copier update
+pixi run copier-update
 ```
-Copier re-applies your saved answers (stored in `.copier-answers.yml`) to the latest
-[released version](#releasing-the-template) of the template and merges the changes
-into your project.
+This runs `copier update`, which re-applies your saved answers (stored in
+`.copier-answers.yml`) to the latest [released version](#releasing-the-template) of
+the template and merges the changes into your project.
 See [these instructions](https://copier.readthedocs.io/en/stable/updating/) for
-details, including how to resolve conflicts.
+details.
+If there are no conflicts, the update is committed right away (which runs the
+pre-commit hooks).
+Otherwise, the conflicted files and the commands to commit the update are printed.
+You can resolve the conflicts with `git mergetool`, which, with
+[vimdiff](https://vimhelp.org/diff.txt.html), shows your project's version (LOCAL),
+the previous template version (BASE), and the new template version (REMOTE) above
+the file to edit (MERGED).
+A short vimdiff cheat sheet is printed along with the conflicts.
 
 To try out template changes that have not been released yet, update against the
 latest commit instead.
 ```sh
-copier update --vcs-ref=HEAD
+pixi run copier-update --vcs-ref=HEAD
 ```
 Copier then warns `No git tags found in template; using HEAD as ref`, which is
 expected here.
@@ -320,9 +399,10 @@ runs its `pixi run init` and `pixi run pre-commit`, and then checks that the
 working tree is clean.
 This tests the setup and all pre-commit hooks of the generated project, including
 `test`, `test-lowest`, and `workflows`, which lints its GitHub Actions workflows.
-For the variant without the Polars plugin, the test then builds the conda package the
-same way the release workflow does.
-(The build is skipped with the plugin, because the optimized release build of Polars
+The test then builds the documentation site the same way the docs workflow does, and,
+for the variant without the Polars plugin, the conda package the same way the release
+workflow does (except for the deploying and publishing steps).
+(The conda build is skipped with the plugin, because the optimized release build of Polars
 is slow, and the plugin's code is already built and tested by the pre-commit hooks.)
 Uncommitted changes to the template are included, so you can test changes before
 committing them.
@@ -339,7 +419,8 @@ pixi run init
 This installs the template repository's own pre-commit hooks, and offers to set Pixi's
 pinning strategy, as described [above](#initialize-local-repository).
 The pre-commit hooks are configured in [`lefthook.yaml`](lefthook.yaml).
-They run the following Pixi tasks, followed by a check that the working tree is clean:
+They check for unresolved merge conflict markers, run the following Pixi tasks, and
+then check that the working tree is clean:
 
 - `fmt`: format the template test with `ruff format`
 - `lint`: lint the template test with `ruff check`
@@ -420,6 +501,27 @@ This has two benefits:
 
 The `lint` task runs Clippy with `--all-features`, so the Python bindings are linted too.
 
+#### Type Stubs
+
+Python tools cannot read the signatures of compiled functions, so the compiled module
+comes with a [type stub](https://typing.python.org/en/latest/spec/distributing.html#stub-files),
+`_core.pyi`, which Ty, Great Docs, and editors read instead.
+The stub is generated from the Rust code by
+[PyO3's stub generation](https://pyo3.rs/latest/type-stub.html): the `experimental-inspect`
+feature of PyO3 (enabled in `Cargo.toml`) embeds a description of the module in the
+compiled library, and `maturin generate-stubs` builds the library and writes the stub
+from it, including the doc comments as docstrings.
+The `stubs` task then formats it with `ruff format` (it is excluded from `ruff check`,
+whose rules for hand-written stubs do not apply).
+The stub is committed, so that every build of the package includes it, and the
+`stubs` pre-commit hook keeps it up to date.
+
+PyO3 cannot see what a `#[pymodule_init]` function adds to the module, and would mark
+the stub as incomplete, so that type checkers accept any attribute of the module.
+This is why `__version__` is exported as a constant with `#[pymodule_export]` instead.
+If PyO3 cannot infer a type annotation, you can give it in the function's
+`#[pyo3(signature = ...)]` attribute (see [here](https://pyo3.rs/latest/type-stub.html)).
+
 #### Building with Pixi
 
 The package is built by the
@@ -450,7 +552,7 @@ reliably:
   changes, but ignores files generated by Cargo in `target/`, which would otherwise
   cause unnecessary rebuilds.
 - `CARGO_TARGET_DIR` points Cargo commands in the `dev` environment (`cargo fmt`,
-  `cargo clippy`, `cargo test`) to `target/dev/`.
+  `cargo clippy`, `cargo test`, `maturin generate-stubs`) to `target/dev/`.
   The `dev` environment and the Pixi package build use different Rust toolchains, and
   if they shared the same build directory each one would invalidate the other's cache,
   forcing full rebuilds.
