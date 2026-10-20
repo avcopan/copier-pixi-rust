@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-20
+
 ### Fixed
 
 - Clippy's pedantic `doc_markdown` lint failed the pre-commit hooks for package names with underscores, since the `CRATE.md` heading (the crate's documentation) named the package without backticks
