@@ -10,7 +10,7 @@ from copier import run_copy
 TEMPLATE = Path(__file__).parents[1]
 
 ANSWERS = {
-    "package_name": "mypkg",
+    "package_name": "my_pkg",
     "repo_name": "mypkg",
     "description": "A test package",
     "author_name": "Jane Doe",
@@ -71,7 +71,7 @@ def test_template(tmp_path: Path, polars_plugin: bool) -> None:
     run(project, "pixi", "run", "docs-build", gitconfig=gitconfig)
     site = project / "great-docs" / "_site"
     assert (site / "index.html").exists()
-    assert (site / "rust" / "mypkg" / "index.html").exists()
+    assert (site / "rust" / "my_pkg" / "index.html").exists()
     # Build the conda package, like the release workflow (whose other steps need GitHub).
     # This is a slow release build, and the Polars plugin only adds dependencies, which
     # the pre-commit hooks have already built and tested, so build only without it.
