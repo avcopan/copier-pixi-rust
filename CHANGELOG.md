@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-20
+
 ### Added
 
 - The Rust API reference (`cargo doc`) in the documentation site, under "Rust API" in the navigation bar; `pixi run docs-rust` builds it on its own, and fails on rustdoc warnings
