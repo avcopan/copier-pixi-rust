@@ -330,14 +330,15 @@ The test needs network access to install the project's environments.
 The [test workflow](.github/workflows/test.yml) runs this test on GitHub Actions for
 every push to the template repository, with both variants in parallel.
 
-### Checking the Template
+### Developing the Template
 
-The template repository has its own pre-commit hooks, which are configured in
-[`lefthook.yaml`](lefthook.yaml).
-After cloning the repository, install them once as follows.
+After cloning the template repository, set it up once as follows.
 ```sh
-pixi run lefthook install
+pixi run init
 ```
+This installs the template repository's own pre-commit hooks, and offers to set Pixi's
+pinning strategy, as described [above](#initialize-local-repository).
+The pre-commit hooks are configured in [`lefthook.yaml`](lefthook.yaml).
 They run the following Pixi tasks, followed by a check that the working tree is clean:
 
 - `fmt`: format the template test with `ruff format`

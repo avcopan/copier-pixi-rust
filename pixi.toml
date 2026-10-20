@@ -20,6 +20,8 @@ changelog = { cmd = "keepachangelog release {{ version }}", args=["version"] }
 release = "tbump"
 # Toggle Git hooks on/off
 hooks = "./scripts/hooks.sh"
+# Set up this repository after cloning it (only run once)
+init = "./scripts/init.sh"
 
 [dependencies]
 python = ">=3.13"
