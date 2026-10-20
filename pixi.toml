@@ -3,13 +3,21 @@ authors = ["avcopan <avcopan@gmail.com>"]
 channels = ["conda-forge"]
 name = "copier-pixi-rust"
 platforms = ["linux-64"]
-version = "0.1.0"
+version = "0.0.0"
 
 [tasks]
 # Generate a project and run its setup and pre-commit hooks (see tests/)
 test = "pytest"
+# Initiate release
+version = "tbump current-version"
+changelog = { cmd = "keepachangelog release {{ version }}", args=["version"] }
+release = "tbump"
 
 [dependencies]
 python = ">=3.13"
 copier = ">=9.19"
 pytest = ">=9.1"
+tbump = "*"
+
+[pypi-dependencies]
+keepachangelog = "*"

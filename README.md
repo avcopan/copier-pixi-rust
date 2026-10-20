@@ -294,9 +294,18 @@ clean working tree.
 copier update
 ```
 Copier re-applies your saved answers (stored in `.copier-answers.yml`) to the latest
-version of the template and merges the changes into your project.
+[released version](#releasing-the-template) of the template and merges the changes
+into your project.
 See [these instructions](https://copier.readthedocs.io/en/stable/updating/) for
 details, including how to resolve conflicts.
+
+To try out template changes that have not been released yet, update against the
+latest commit instead.
+```sh
+copier update --vcs-ref=HEAD
+```
+Copier then warns `No git tags found in template; using HEAD as ref`, which is
+expected here.
 
 ### Testing the Template
 
@@ -320,6 +329,30 @@ committing them.
 The test needs network access to install the project's environments.
 The [test workflow](.github/workflows/test.yml) runs this test on GitHub Actions for
 every push to the template repository, with both variants in parallel.
+
+### Releasing the Template
+
+The template is versioned and released in the same way as the generated projects (see
+[above](#release-new-versions)).
+The following command shows the current version number.
+```sh
+pixi run version
+```
+Describe your changes under the `[Unreleased]` heading in [`CHANGELOG.md`](CHANGELOG.md),
+and then trigger a release by running this command.
+```sh
+pixi run release <new version number>
+```
+This updates the version in `pixi.toml`, turns the `[Unreleased]` section of
+`CHANGELOG.md` into an entry for the new version, and creates a release commit tagged
+with the new version number, then pushes both the commit and the tag to GitHub.
+When the tag is pushed, it triggers the [release workflow](.github/workflows/release.yml),
+which runs the template test and then posts the new release on GitHub, using the
+`CHANGELOG.md` entry as the release notes.
+Nothing is published to a package index.
+
+`copier update` only picks up template changes once they are released, since it
+updates projects to the latest tagged version (see [above](#updating-against-template-changes)).
 
 ### How It Works
 

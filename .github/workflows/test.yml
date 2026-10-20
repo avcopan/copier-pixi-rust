@@ -2,9 +2,10 @@ name: test
 
 on:
   push:
-    branches: ["**"]
+    branches: ["**"]  # all branches, but not tags (releases run this workflow themselves)
   pull_request:
   workflow_dispatch:
+  workflow_call:  # allows the release workflow to run the tests first
 
 jobs:
   test:
