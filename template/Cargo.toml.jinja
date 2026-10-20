@@ -5,8 +5,10 @@ edition = "2024"
 description = "{{description}}"
 license = "MIT"
 repository = "https://github.com/{{github_org_name}}/{{repo_name}}"
+homepage = "https://{{github_org_name}}.github.io/{{repo_name}}/"
+readme = "CRATE.md"  # the crates.io page, also the crate docs (see src/lib.rs)
 # Files to include when publishing to crates.io (the Python package is not needed there)
-include = ["/src", "/Cargo.toml", "/Cargo.lock", "/README.md", "/LICENSE"]
+include = ["/src", "/Cargo.toml", "/Cargo.lock", "/CRATE.md", "/LICENSE"]
 
 [lib]
 # cdylib: the compiled Python extension module (built by maturin)

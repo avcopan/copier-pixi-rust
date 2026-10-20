@@ -69,7 +69,9 @@ def test_template(tmp_path: Path, polars_plugin: bool) -> None:
     run(project, "pixi", "run", "pre-commit", gitconfig=gitconfig)
     # Build the documentation site, like the docs workflow (whose deploy step needs GitHub)
     run(project, "pixi", "run", "docs-build", gitconfig=gitconfig)
-    assert (project / "great-docs" / "_site" / "index.html").exists()
+    site = project / "great-docs" / "_site"
+    assert (site / "index.html").exists()
+    assert (site / "rust" / "mypkg" / "index.html").exists()
     # Build the conda package, like the release workflow (whose other steps need GitHub).
     # This is a slow release build, and the Polars plugin only adds dependencies, which
     # the pre-commit hooks have already built and tested, so build only without it.

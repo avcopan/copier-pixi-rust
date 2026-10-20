@@ -26,6 +26,7 @@ This is primarily for my own development.
 - Git hooks with [LeftHook](https://lefthook.dev/)
 - Versioning and release triggering with [tbump](https://github.com/your-tools/tbump)
 - Documentation with [Great Docs](https://posit-dev.github.io/great-docs/), including auto-generated API reference
+- Rust API reference with [rustdoc](https://doc.rust-lang.org/rustdoc/), published with the documentation site and on [docs.rs](https://docs.rs/)
 - Documentation hosting on [GitHub Pages](https://docs.github.com/en/pages)
 - Great Docs [agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html) for [Claude Code](https://code.claude.com/docs/en/skills)
 - Continuous integration with [GitHub Actions](https://github.com/features/actions), including:
@@ -156,12 +157,18 @@ Then complete the following steps.
 The Rust code lives in [`src/`](template/src/), as for any Rust project:
 
 - [`src/lib.rs`](template/src/lib.rs.jinja) defines the public Rust API.
+  Its crate documentation is included from `CRATE.md` (see below).
 - [`src/greet.rs`](template/src/greet.rs.jinja) is an example module, including a
   unit test and a doc test.
 - [`src/python.rs`](template/src/python.rs) defines the Python bindings: a
   `#[pymodule]` named `_core` that wraps Rust functions with `#[pyfunction]`.
   Their doc comments become the Python docstrings, so they are written in Python's
   (Google) docstring style.
+
+[`CRATE.md`](template/CRATE.md.jinja) is a short description of the Rust library, which
+is both its page on crates.io and the landing page of its API reference (see
+[below](#rust-documentation)).
+Its Rust code blocks are run as doc tests by `cargo test`.
 
 The Python package lives in [`python/<package_name>/`](template/python/{{package_name}}/):
 
@@ -297,6 +304,12 @@ described
 For everything else, see the
 [Great Docs user guide](https://posit-dev.github.io/great-docs/user-guide/introduction.html).
 
+The site also includes the Rust API reference, generated from the doc comments of your
+public Rust API with [rustdoc](https://doc.rust-lang.org/rustdoc/) (`cargo doc`), under
+`Rust API` in the navigation bar (see [below](#rust-documentation)).
+To only build the Rust API reference, run `pixi run docs-rust`, which fails on rustdoc
+warnings, such as links to items that do not exist.
+
 The project also includes the Great Docs
 [agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html)
 in `.claude/skills/`, which teach Claude Code how to configure the site, write user
@@ -399,7 +412,8 @@ runs its `pixi run init` and `pixi run pre-commit`, and then checks that the
 working tree is clean.
 This tests the setup and all pre-commit hooks of the generated project, including
 `test`, `test-lowest`, and `workflows`, which lints its GitHub Actions workflows.
-The test then builds the documentation site the same way the docs workflow does, and,
+The test then builds the documentation site (with the Rust API reference) the same way
+the docs workflow does, and,
 for the variant without the Polars plugin, the conda package the same way the release
 workflow does (except for the deploying and publishing steps).
 (The conda build is skipped with the plugin, because the optimized release build of Polars
@@ -521,6 +535,31 @@ the stub as incomplete, so that type checkers accept any attribute of the module
 This is why `__version__` is exported as a constant with `#[pymodule_export]` instead.
 If PyO3 cannot infer a type annotation, you can give it in the function's
 `#[pyo3(signature = ...)]` attribute (see [here](https://pyo3.rs/latest/type-stub.html)).
+
+#### Rust Documentation
+
+The Rust library is documented in three places, which all start from `CRATE.md`:
+
+- **crates.io** shows `CRATE.md` as the crate's page (`readme` in `Cargo.toml`), with
+  links to the documentation site (`homepage`), the repository (`repository`), and docs.rs.
+- **[docs.rs](https://docs.rs/)** builds and hosts the API reference of every version
+  published to crates.io.
+  Its landing page is the crate documentation, which `src/lib.rs` includes from
+  `CRATE.md` (`#![doc = include_str!("../CRATE.md")]`).
+  It is built with the default features, so it documents the plain Rust library, without
+  the Python bindings.
+- **The documentation site** includes the same API reference, built from the `main`
+  branch.
+  `pixi run docs-build` runs `cargo doc` (also without the Python bindings) and copies
+  its output into the site under `rust/`, after Great Docs has built the rest of the
+  site.
+  The `Rust API` link in the navigation bar comes from
+  [`rustdoc/index.html`](template/rustdoc/index.html.jinja), a page that Great Docs adds
+  to the site unchanged (configured under `custom_pages` in `great-docs.yml`), and
+  which redirects to the API reference.
+
+Since `CRATE.md` is shown on crates.io and docs.rs, its links must be absolute URLs.
+The PyPI page shows `README.md` instead (`readme` in `pyproject.toml`).
 
 #### Building with Pixi
 

@@ -25,7 +25,7 @@ jobs:
           cache: true
           environments: dev
 
-      - name: Build documentation site
+      - name: Build documentation site (with the Rust API reference)
         run: pixi run docs-build
         env:
           GITHUB_TOKEN: ${{ github.token }}  # for the changelog page (from GitHub Releases)

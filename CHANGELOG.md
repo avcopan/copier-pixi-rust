@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- The Rust API reference (`cargo doc`) in the documentation site, under "Rust API" in the navigation bar; `pixi run docs-rust` builds it on its own, and fails on rustdoc warnings
+- `CRATE.md`, a short description of the Rust library, used as its crates.io page and as the landing page of its API reference (on docs.rs and the documentation site), with Rust code blocks run as doc tests
+- The documentation site as the crate's `homepage` in `Cargo.toml`
+
+### Fixed
+
+- The PyPI page had no description, since maturin ignores Cargo.toml's readme when `pyproject.toml` has a `[project]` table; `readme = "README.md"` is now set in `pyproject.toml`
+
 ## [0.1.0] - 2026-10-20
 
 ### Added

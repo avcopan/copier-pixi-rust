@@ -107,7 +107,8 @@ pre-commit = "lefthook run pre-commit --all-files"
 pre-commit-check = "lefthook run pre-commit --all-files --tag check"  # skips the tests
 pre-commit-local = "lefthook run pre-commit-local --all-files"
 # Build and preview documentation (see great-docs.yml)
-docs-build = "great-docs build"
+docs-rust = { cmd = "cargo doc --no-deps --locked", env = { RUSTDOCFLAGS = "-D warnings" } }  # Rust API reference
+docs-build = { cmd = "great-docs build && cp -r \"$CARGO_TARGET_DIR/doc/.\" great-docs/_site/rust/", depends-on = ["docs-rust"] }
 docs-preview = { cmd = "great-docs preview", depends-on = ["docs-build"] }
 # Build and publish conda package
 build-conda = "pixi publish --target-dir dist"
