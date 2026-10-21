@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-20
+
 ### Fixed
 
 - The tests failed on GitHub Actions with `ModuleNotFoundError: No module named '<package_name>._core'` whenever the Pixi environments were restored from the cache, since the compiled module of the editable install is not part of the cache; the workflows now install the package in non-editable mode (`BUILD_EDITABLE_PYTHON: "false"`), and caches created before this change must be deleted once
