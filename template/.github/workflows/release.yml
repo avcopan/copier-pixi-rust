@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+env:
+  # Install the package in non-editable mode, so that the environments restored by the
+  # Pixi cache are complete (editable installs place the compiled module in python/,
+  # which is not cached, and Pixi does not rebuild it because no source file changed)
+  BUILD_EDITABLE_PYTHON: "false"
+
 jobs:
   test:
     uses: ./.github/workflows/test.yml

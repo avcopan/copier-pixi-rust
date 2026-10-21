@@ -575,6 +575,18 @@ Rust code (using the fast, unoptimized `dev` profile, because of `editable-profi
 files take effect immediately.
 Changes to Rust files trigger an incremental rebuild the next time you use `pixi run`.
 
+The GitHub Actions workflows install the package in non-editable mode instead, by
+setting `BUILD_EDITABLE_PYTHON: "false"`.
+The workflows cache the Pixi environments, but the compiled module of an editable install
+is in `python/<package_name>/` rather than in the environment, so it is not part of the
+cache (and it is ignored by Git, so it is not part of the checkout either).
+Since no source file has changed, Pixi considers the restored environment up to date and
+does not rebuild the package, and the tests fail with
+`ModuleNotFoundError: No module named '<package_name>._core'`.
+A non-editable install keeps the compiled module inside the environment.
+(Pixi does not reinstall an environment when this variable changes, so if a cache was
+created before it was set, delete it under the repository's Actions → Caches.)
+
 A few settings in [`pixi.toml`](template/pixi.toml.jinja) are needed to make this work
 reliably:
 
