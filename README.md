@@ -86,32 +86,37 @@ secrets are needed.
 Instead, you tell each package index once that your repository's `release.yml`
 workflow is allowed to publish to it.
 
-- **Conda (prefix.dev).**
-  Create a channel on [prefix.dev](https://prefix.dev/), if you do not have one yet
-  (this is the `prefix_channel` from above), and then follow
-  [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
-  to add Repository Access for GitHub, using the workflow filename `release.yml` and
-  the Read/write mode.
 - **PyPI.**
   Follow
   [these instructions](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
   to add a pending publisher on both [PyPI](https://pypi.org/) and
   [Test PyPI](https://test.pypi.org/), using your package name as the project name
-  and the workflow name `release.yml`.
+  and the workflow filename `release.yml`.
+  If you do not have accounts on these sites yet, create them first.
+- **Conda (prefix.dev).**
+  Follow
+  [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
+  to add Repository Access for GitHub on your channel (the `prefix_channel` from above),
+  using the workflow filename `release.yml` and the Read/write mode.
+  If you do not have an account and a channel on [prefix.dev](https://prefix.dev/) yet,
+  create them first.
 - **crates.io.**
-  crates.io requires the crate to exist before Trusted Publishing can be set up, so
-  after [initializing your repository](#initialize-local-repository), publish its
-  initial `0.0.0` version once from your computer.
-  Create an API token with the `publish-new` scope under `Account Settings > API Tokens`
-  on [crates.io](https://crates.io/), and run the following.
+  Unlike the others, crates.io can only set up Trusted Publishing for a crate that
+  already exists, so the initial publish has to be done by hand (see the steps at the
+  end of this item).
+  Once version `0.0.0` of your crate has been published, follow
+  [these instructions](https://crates.io/docs/trusted-publishing) to add a GitHub
+  publisher under your crate's `Settings`, using the workflow filename `release.yml`.
+  To do the initial publish, create an account on [crates.io](https://crates.io/) if you
+  do not have one yet.
+  Then, after [initializing your repository](#initialize-local-repository), create an
+  API token with the `publish-new` scope under `Account Settings > API Tokens` and run
+  the following from your computer (then delete the token).
   ```sh
   pixi run -e dev cargo login     # paste the token when prompted
   pixi run publish-crates
   pixi run -e dev cargo logout
   ```
-  Then follow [these instructions](https://crates.io/docs/trusted-publishing) to add a
-  GitHub publisher, using the workflow filename `release.yml`, and delete the token.
-  Your releases will then be published to crates.io by the release workflow.
   If you do not want to publish to crates.io, delete the `publish-crates` job from
   [`release.yml`](template/.github/workflows/release.yml) and remove it from the
   `needs` list of the `release` job.
