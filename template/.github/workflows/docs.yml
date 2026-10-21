@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
 
+# Let a running deployment finish before starting the next one
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 env:
   # Install the package in non-editable mode, so that the environments restored by the
   # Pixi cache are complete (editable installs place the compiled module in python/,

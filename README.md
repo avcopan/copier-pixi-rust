@@ -356,6 +356,10 @@ on GitHub Actions, which runs the following jobs:
   (`cargo publish`)
 - `release`: posts the new release on GitHub, with the release notes taken from `CHANGELOG.md`
 
+If a release fails partway, rerun the failed jobs on GitHub.
+The Conda and PyPI uploads skip files that were already uploaded, so rerunning `publish`
+works even if one of its two uploads succeeded.
+
 #### Publish to Test PyPI
 
 The
@@ -667,6 +671,16 @@ the Pixi build cache and reinstall:
 rm -rf target
 pixi clean --build
 pixi install --all
+```
+
+**`ModuleNotFoundError: No module named '<package_name>._core'`.**
+The compiled module of the editable install is missing from `python/<package_name>/`,
+for example after `git clean -fdX`.
+Since no source file has changed, Pixi does not rebuild it on its own (see
+[Building with Pixi](#building-with-pixi)).
+Reinstall the package in the environment you are using:
+```sh
+pixi reinstall -e <environment> <package_name>
 ```
 
 ### Using Pixi on an HPC Cluster
