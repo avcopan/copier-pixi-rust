@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-22
+
 ### Added
 
 - Lints from the [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/) in `Cargo.toml`: `missing_docs` (C-CRATE-DOC, C-EXAMPLE), `missing_debug_implementations` (C-DEBUG), and `clippy::cargo_common_metadata` (C-METADATA)
