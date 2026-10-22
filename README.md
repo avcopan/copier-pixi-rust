@@ -210,8 +210,8 @@ The fix is to have VS Code load the environment from `.envrc`:
    `pixi global install direnv`).
 2. Open the project folder itself in VS Code (`code <repo_name>`), not a folder above
    it, because the direnv extension only reads the `.envrc` of the workspace root.
-3. Install the recommended extensions when VS Code offers them (rust-analyzer,
-   direnv, and Tombi, listed in `.vscode/extensions.json`).
+3. Install the recommended extensions when VS Code offers them (listed in
+   `.vscode/extensions.json`), or search the Extensions view for `@recommended`.
 4. When the direnv extension asks, allow the `.envrc` (or run `direnv allow` in the
    project folder), then restart the extensions when it asks you to.
 
@@ -221,6 +221,14 @@ library source (`rust-src`) it needs to resolve `std`, and builds into the same
 
 Use Tombi rather than Even Better TOML for TOML files: Even Better TOML marks the
 (valid) `[lints]` tables in `Cargo.toml` as errors.
+
+`.vscode/settings.json` sets up the editor to match the pre-commit hooks: rustfmt and
+Ruff format on save, rust-analyzer checks with Clippy (so the pedantic lints show up as
+you type), and all Cargo features are enabled so that `src/python.rs` is analyzed too.
+It uses ty instead of Pylance and runs pytest from the Testing view.
+These workspace settings only override the user settings they name, so a user setting
+that replaces rust-analyzer's environment (such as `rust-analyzer.server.extraEnv`
+with a `PATH`) still applies and can hide the Pixi toolchain; remove any such setting.
 
 #### Manage Rust Dependencies
 
