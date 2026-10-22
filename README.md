@@ -50,6 +50,7 @@ pixi global install copier
 ```
 
 Optionally, you can also install [direnv](https://direnv.net/docs/installation.html) to automatically load your environment for you.
+This is also what lets VS Code use the Pixi toolchain (see [below](#set-up-vs-code)).
 
 ### Setup
 
@@ -196,6 +197,30 @@ To expose a new Rust function to Python, you therefore (1) write the Rust functi
 (2) wrap it in `src/python.rs`, and (3) re-export it in `__init__.py`.
 The type stub is updated when you commit (or run `pixi run stubs` to update it right
 away).
+
+#### Set Up VS Code
+
+The Rust toolchain (`cargo`, `rustc`, and the C linker that `rustc` calls) is
+installed in the Pixi `dev` environment, which VS Code does not know about on its own.
+rust-analyzer then falls back to whatever `cargo` is on your `PATH`, if any, so "Run
+Test" and "Run Doctest" fail with errors such as ``linker `cc` not found``.
+The fix is to have VS Code load the environment from `.envrc`:
+
+1. Install [direnv](https://direnv.net/docs/installation.html) (for example,
+   `pixi global install direnv`).
+2. Open the project folder itself in VS Code (`code <repo_name>`), not a folder above
+   it, because the direnv extension only reads the `.envrc` of the workspace root.
+3. Install the recommended extensions when VS Code offers them (rust-analyzer,
+   direnv, and Tombi, listed in `.vscode/extensions.json`).
+4. When the direnv extension asks, allow the `.envrc` (or run `direnv allow` in the
+   project folder), then restart the extensions when it asks you to.
+
+rust-analyzer then uses the `dev` environment's toolchain, including the standard
+library source (`rust-src`) it needs to resolve `std`, and builds into the same
+`target/dev/` directory as `pixi run -e dev cargo test`.
+
+Use Tombi rather than Even Better TOML for TOML files: Even Better TOML marks the
+(valid) `[lints]` tables in `Cargo.toml` as errors.
 
 #### Manage Rust Dependencies
 

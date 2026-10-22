@@ -1,19 +1,20 @@
-#![doc = include_str!("../CRATE.md")] // the crate docs are the crates.io page
+// The crate docs are included from CRATE.md, which is also the crates.io page.
+#![doc = include_str!("../CRATE.md")]
 
 mod greet;
 
 pub use greet::greet;
 
-// Python bindings (only compiled when the `python` feature is enabled)
+// The Python bindings are only compiled when the `python` feature is enabled.
 #[cfg(feature = "python")]
 mod python;
 {%- if polars_plugin %}
 
-// Polars expression plugins (only compiled when the `python` feature is enabled)
+// The Polars expression plugins are only compiled when the `python` feature is enabled.
 #[cfg(feature = "python")]
 mod expressions;
 
-// Polars plugins must use the same memory allocator as Polars itself
+// Polars plugins must use the same memory allocator as Polars itself.
 #[cfg(feature = "python")]
 #[global_allocator]
 static ALLOC: pyo3_polars::PolarsAllocator = pyo3_polars::PolarsAllocator::new();
