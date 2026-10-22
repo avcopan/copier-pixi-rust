@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - Tombi warned that `pixi.toml` defines tables out of order; `[environments]` now comes before the `[feature.*]` tables, and `[feature.test.tasks]` follows `[feature.test.dependencies]`
+- Clippy's `doc_markdown` lint failed on Google-style Python docstrings in `src/python.rs` whenever a parameter name contained an underscore; it is now allowed in that file
+- Ruff's `PLR2004` (magic value) failed on literal expected values in tests; it is now ignored in `tests/`
 
 ## [0.1.8] - 2026-10-22
 

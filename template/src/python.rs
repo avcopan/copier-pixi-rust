@@ -1,3 +1,7 @@
+// The docstrings below are Python's (Google style), whose `Args:` entries name
+// parameters without backticks
+#![allow(clippy::doc_markdown)]
+
 use pyo3::prelude::*;
 
 /// The compiled Python module, imported as `<package_name>._core`.
