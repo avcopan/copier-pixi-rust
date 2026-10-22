@@ -23,6 +23,16 @@ description:
   type: str
   help: Short package description (required by crates.io)
 
+keywords:
+  type: yaml
+  help: crates.io keywords, as a list (e.g. [chemistry, graph]; at most 5)
+  validator: "{% if keywords is string or keywords | length == 0 or keywords | length > 5 %}Enter a list of 1 to 5 keywords{% endif %}"
+
+categories:
+  type: yaml
+  help: crates.io category slugs, as a list (e.g. [science]; see https://crates.io/category_slugs)
+  validator: "{% if categories is string or categories | length == 0 or categories | length > 5 %}Enter a list of 1 to 5 category slugs{% endif %}"
+
 author_name:
   type: str
   help: Author name

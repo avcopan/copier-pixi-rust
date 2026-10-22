@@ -63,6 +63,9 @@ copier copy gh:avcopan/copier-pixi-rust <repo_name>
 Copier will prompt you for the package name and other settings.
 For `repo_name`, enter the name of your GitHub repository (by default, the package
 name), which is used for the links to your repository and documentation site.
+For `keywords` and `categories`, enter YAML lists such as `[chemistry, graph]` and
+`[science]` (crates.io allows at most 5 of each; categories must be
+[valid slugs](https://crates.io/category_slugs)).
 For `prefix_channel`, enter the prefix.dev channel to publish to (see
 [below](#prepare-remote-github-repository)), as `<namespace>` or
 `<namespace>/<channel>`.

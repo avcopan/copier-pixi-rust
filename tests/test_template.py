@@ -13,6 +13,8 @@ ANSWERS = {
     "package_name": "my_pkg",
     "repo_name": "mypkg",
     "description": "A test package",
+    "keywords": ["test"],
+    "categories": ["science"],
     "author_name": "Jane Doe",
     "author_email": "jane@example.com",
     "github_org_name": "janedoe",
