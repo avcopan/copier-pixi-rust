@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Rust tests failed to link with `unable to find library -lpython3.x` when run with the `python` feature, as rust-analyzer's Run/Debug buttons in VS Code do; the dev environment now sets `PYO3_BUILD_EXTENSION_MODULE`, so PyO3 no longer links libpython
+
 ## [0.1.9] - 2026-10-22
 
 ### Fixed
