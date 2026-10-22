@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Lints from the [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/) in `Cargo.toml`: `missing_docs` (C-CRATE-DOC, C-EXAMPLE), `missing_debug_implementations` (C-DEBUG), and `clippy::cargo_common_metadata` (C-METADATA)
+- A `rust-review` agent skill in `.claude/skills/`, which reviews Rust code against the Rust API Guidelines and the Rust Book's conventions for `use` paths and public APIs (the judgment calls that the lints can't make)
 - `keywords` and `categories` questions, which fill in the crates.io metadata that `cargo_common_metadata` requires; `copier update` asks them once for existing projects
 
 ## [0.1.5] - 2026-10-21

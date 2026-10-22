@@ -29,6 +29,7 @@ This is primarily for my own development.
 - Rust API reference with [rustdoc](https://doc.rust-lang.org/rustdoc/), published with the documentation site and on [docs.rs](https://docs.rs/)
 - Documentation hosting on [GitHub Pages](https://docs.github.com/en/pages)
 - Great Docs [agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html) for [Claude Code](https://code.claude.com/docs/en/skills)
+- A `rust-review` agent skill and lints for the [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - Continuous integration with [GitHub Actions](https://github.com/features/actions), including:
   - Linting, formatting, testing, etc.
   - Deploying the documentation site
@@ -324,6 +325,11 @@ in `.claude/skills/`, which teach Claude Code how to configure the site, write u
 guide pages, and revise docstrings.
 These are copied from the Great Docs release that this template targets, and are
 updated with the template.
+A further skill, `rust-review`, reviews Rust code against the
+[Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html) and
+the Rust Book's conventions for `use` paths and public APIs, covering what the
+lints in `Cargo.toml` cannot check.
+Claude Code loads it when asked for a review of Rust code, or run `/rust-review`.
 
 #### Release New Versions
 
