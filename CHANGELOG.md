@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-10-22
+
 ### Added
 
 - `.vscode/extensions.json`, which recommends rust-analyzer, the direnv extension, and Tombi (for TOML schemas), so that VS Code loads the Pixi `dev` environment from `.envrc` (see "Set Up VS Code" in the README)
