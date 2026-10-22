@@ -200,35 +200,19 @@ away).
 
 #### Set Up VS Code
 
-The Rust toolchain (`cargo`, `rustc`, and the C linker that `rustc` calls) is
-installed in the Pixi `dev` environment, which VS Code does not know about on its own.
-rust-analyzer then falls back to whatever `cargo` is on your `PATH`, if any, so "Run
-Test" and "Run Doctest" fail with errors such as ``linker `cc` not found``.
-The fix is to have VS Code load the environment from `.envrc`:
+The Rust toolchain is installed in the Pixi `dev` environment, which VS Code loads from
+`.envrc` through the direnv extension:
 
 1. Install [direnv](https://direnv.net/docs/installation.html) (for example,
    `pixi global install direnv`).
-2. Open the project folder itself in VS Code (`code <repo_name>`), not a folder above
-   it, because the direnv extension only reads the `.envrc` of the workspace root.
-3. Install the recommended extensions when VS Code offers them (listed in
-   `.vscode/extensions.json`), or search the Extensions view for `@recommended`.
-4. When the direnv extension asks, allow the `.envrc` (or run `direnv allow` in the
-   project folder), then restart the extensions when it asks you to.
+2. Open the project folder itself in VS Code (`code <repo_name>`), since the direnv
+   extension only reads the `.envrc` of the workspace root.
+3. Install the recommended extensions (search the Extensions view for `@recommended`).
+4. Allow the `.envrc` when the direnv extension asks, then restart the extensions.
 
-rust-analyzer then uses the `dev` environment's toolchain, including the standard
-library source (`rust-src`) it needs to resolve `std`, and builds into the same
-`target/dev/` directory as `pixi run -e dev cargo test`.
-
-Use Tombi rather than Even Better TOML for TOML files: Even Better TOML marks the
-(valid) `[lints]` tables in `Cargo.toml` as errors.
-
-`.vscode/settings.json` sets up the editor to match the pre-commit hooks: rustfmt and
-Ruff format on save, rust-analyzer checks with Clippy (so the pedantic lints show up as
-you type), and all Cargo features are enabled so that `src/python.rs` is analyzed too.
-It uses ty instead of Pylance and runs pytest from the Testing view.
-These workspace settings only override the user settings they name, so a user setting
-that replaces rust-analyzer's environment (such as `rust-analyzer.server.extraEnv`
-with a `PATH`) still applies and can hide the Pixi toolchain; remove any such setting.
+`.vscode/settings.json` matches the pre-commit hooks: rustfmt and Ruff format on save,
+rust-analyzer checks with Clippy, and pytest runs in the `test` environment.
+Tombi is recommended over Even Better TOML, which flags valid `[lints]` tables as errors.
 
 #### Manage Rust Dependencies
 
