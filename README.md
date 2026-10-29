@@ -69,7 +69,7 @@ For `keywords` and `categories`, enter YAML lists such as `[chemistry, graph]` a
 `[science]` (crates.io allows at most 5 of each; categories must be
 [valid slugs](https://crates.io/category_slugs)).
 For `prefix_channel`, enter the prefix.dev channel to publish to (see
-[below](#prepare-remote-github-repository)), as `<namespace>` or
+[below](#set-up-publishing)), as `<namespace>` or
 `<namespace>/<channel>`.
 Answer "yes" to the Polars question if you want to set up a
 [Polars expression plugin](#polars-expression-plugins).
@@ -77,54 +77,10 @@ Answer "yes" to the Polars question if you want to set up a
 #### Prepare Remote GitHub Repository
 
 Follow [these instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository) to create an empty remote repository on GitHub (without a README, license, or `.gitignore`), using `repo_name` from above as its name.
-Then complete the following configurations, which are needed by the GitHub Actions workflows.
-
-**Documentation.**
-To enable deploying your documentation site, navigate to `Settings > Pages` on your
-GitHub repository site and set the `Source` for your GitHub Pages deployment to
+Then, to enable deploying your documentation site, navigate to `Settings > Pages` on
+your GitHub repository site and set the `Source` for your GitHub Pages deployment to
 "GitHub Actions".
-
-**Package publication.**
-The release workflow publishes packages using
-[Trusted Publishing](https://docs.pypi.org/trusted-publishers/), so no API tokens or
-secrets are needed.
-Instead, you tell each package index once that your repository's `release.yml`
-workflow is allowed to publish to it.
-
-- **PyPI.**
-  Follow
-  [these instructions](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
-  to add a pending publisher on both [PyPI](https://pypi.org/) and
-  [Test PyPI](https://test.pypi.org/), using your package name as the project name
-  and the workflow filename `release.yml`.
-  If you do not have accounts on these sites yet, create them first.
-- **Conda (prefix.dev).**
-  Follow
-  [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
-  to add Repository Access for GitHub on your channel (the `prefix_channel` from above),
-  using the workflow filename `release.yml` and the Read/write mode.
-  If you do not have an account and a channel on [prefix.dev](https://prefix.dev/) yet,
-  create them first.
-- **crates.io.**
-  Unlike the others, crates.io can only set up Trusted Publishing for a crate that
-  already exists, so the initial publish has to be done by hand (see the steps at the
-  end of this item).
-  Once version `0.0.0` of your crate has been published, follow
-  [these instructions](https://crates.io/docs/trusted-publishing) to add a GitHub
-  publisher under your crate's `Settings`, using the workflow filename `release.yml`.
-  To do the initial publish, create an account on [crates.io](https://crates.io/) if you
-  do not have one yet.
-  Then, after [initializing your repository](#initialize-local-repository), create an
-  API token with the `publish-new` scope under `Account Settings > API Tokens` and run
-  the following from your computer (then delete the token).
-  ```sh
-  pixi run -e dev cargo login     # paste the token when prompted
-  pixi run publish-crates
-  pixi run -e dev cargo logout
-  ```
-  If you do not want to publish to crates.io, delete the `publish-crates` job from
-  [`release.yml`](template/.github/workflows/release.yml) and remove it from the
-  `needs` list of the `release` job.
+(This is needed before you push, since the docs workflow deploys the site on every push.)
 
 #### Initialize Local Repository
 
@@ -154,11 +110,69 @@ Then complete the following steps.
    This makes it easy to navigate to your documentation site from GitHub.
    The site lives at `https://<github_org_name>.github.io/<repo_name>/` and gets updated
    by the docs workflow on every push to `main`.
-3. **Publish to crates.io once.**
-   Publish the initial version of your crate and set up Trusted Publishing for it, as
-   described [above](#prepare-remote-github-repository).
-4. **Before your first release.**
-   Consider doing a [test release on Test PyPI](#publish-to-test-pypi).
+
+#### Set Up VS Code
+
+If you use VS Code, set it up as follows.
+The Rust toolchain is installed in the Pixi `dev` environment, which VS Code loads from
+`.envrc` through the direnv extension:
+
+1. Install [direnv](https://direnv.net/docs/installation.html) (for example,
+   `pixi global install direnv`).
+2. Open the project folder itself in VS Code (`code <repo_name>`), since the direnv
+   extension only reads the `.envrc` of the workspace root.
+3. Install the recommended extensions (search the Extensions view for `@recommended`).
+4. Allow the `.envrc` when the direnv extension asks, then restart the extensions.
+
+`.vscode/settings.json` matches the pre-commit hooks: rustfmt and Ruff format on save,
+rust-analyzer checks with Clippy, and pytest runs in the `test` environment.
+Tombi is recommended over Even Better TOML, which flags valid `[lints]` tables as errors.
+
+#### Set Up Publishing
+
+The [release workflow](#release-new-versions) publishes packages using
+[Trusted Publishing](https://docs.pypi.org/trusted-publishers/), so no API tokens or
+secrets are needed.
+Instead, you tell each package index once that your repository's `release.yml`
+workflow is allowed to publish to it.
+This is only needed before your first release, so you can do it at any point after
+setting up your repository.
+
+1. **PyPI.**
+   Follow
+   [these instructions](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
+   to add a pending publisher on both [PyPI](https://pypi.org/) and
+   [Test PyPI](https://test.pypi.org/), using your package name as the project name
+   and the workflow filename `release.yml`.
+   If you do not have accounts on these sites yet, create them first.
+2. **Conda (prefix.dev).**
+   Follow
+   [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
+   to add Repository Access for GitHub on your channel (the `prefix_channel` from above),
+   using the workflow filename `release.yml` and the Read/write mode.
+   If you do not have an account and a channel on [prefix.dev](https://prefix.dev/) yet,
+   create them first.
+3. **crates.io.**
+   Unlike the others, crates.io can only set up Trusted Publishing for a crate that
+   already exists, so the initial publish has to be done by hand.
+   Create an account on [crates.io](https://crates.io/) if you do not have one yet.
+   Then create an API token with the `publish-new` scope under
+   `Account Settings > API Tokens` and run the following from your computer (then delete
+   the token).
+   ```sh
+   pixi run -e dev cargo login     # paste the token when prompted
+   pixi run publish-crates
+   pixi run -e dev cargo logout
+   ```
+   Once version `0.0.0` of your crate has been published, follow
+   [these instructions](https://crates.io/docs/trusted-publishing) to add a GitHub
+   publisher under your crate's `Settings`, using the workflow filename `release.yml`.
+   If you do not want to publish to crates.io, delete the `publish-crates` job from
+   [`release.yml`](template/.github/workflows/release.yml) and remove it from the
+   `needs` list of the `release` job instead.
+4. **Test release.**
+   Consider doing a [test release on Test PyPI](#publish-to-test-pypi) before your first
+   real release.
 
 ### Usage
 
@@ -197,22 +211,6 @@ To expose a new Rust function to Python, you therefore (1) write the Rust functi
 (2) wrap it in `src/python.rs`, and (3) re-export it in `__init__.py`.
 The type stub is updated when you commit (or run `pixi run stubs` to update it right
 away).
-
-#### Set Up VS Code
-
-The Rust toolchain is installed in the Pixi `dev` environment, which VS Code loads from
-`.envrc` through the direnv extension:
-
-1. Install [direnv](https://direnv.net/docs/installation.html) (for example,
-   `pixi global install direnv`).
-2. Open the project folder itself in VS Code (`code <repo_name>`), since the direnv
-   extension only reads the `.envrc` of the workspace root.
-3. Install the recommended extensions (search the Extensions view for `@recommended`).
-4. Allow the `.envrc` when the direnv extension asks, then restart the extensions.
-
-`.vscode/settings.json` matches the pre-commit hooks: rustfmt and Ruff format on save,
-rust-analyzer checks with Clippy, and pytest runs in the `test` environment.
-Tombi is recommended over Even Better TOML, which flags valid `[lints]` tables as errors.
 
 #### Manage Rust Dependencies
 
@@ -360,7 +358,8 @@ Once you decide the appropriate next version number according to
 [SemVer](https://semver.org/)
 semantics, describe your changes under the `[Unreleased]` heading in `CHANGELOG.md`,
 following the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
-Then trigger a release by running this command.
+Then trigger a release by running this command (once you have
+[set up publishing](#set-up-publishing)).
 ```sh
 pixi run release <new version number>
 ```
@@ -404,7 +403,7 @@ To do a test release on Test PyPI instead, swap the commented line as follows:
 pixi run publish-test-pypi  #      <-- uncomment for test release
 ```
 No other changes are needed, as long as you have added a pending publisher on Test PyPI
-as described [above](#prepare-remote-github-repository).
+as described [above](#set-up-publishing).
 Remember to swap the lines back before your first real release.
 
 ### Updating Against Template Changes

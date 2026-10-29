@@ -2,7 +2,7 @@ _subdirectory: template
 
 _message_after_copy: |
   Your project has been created in {{ _copier_conf.dst_path }}.
-  Next, set up your GitHub repository and package publication as described here:
+  Next, set up your GitHub repository as described here:
     https://github.com/avcopan/copier-pixi-rust#prepare-remote-github-repository
   Then initialize your local repository:
     cd {{ _copier_conf.dst_path }}
