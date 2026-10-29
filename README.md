@@ -280,6 +280,8 @@ pixi run pre-commit-local   # run pre-commit hooks with local dependencies
 These pre-commit hooks are [configured and run](https://lefthook.dev/configuration/run.html) using LeftHook.
 They start by checking for unresolved merge conflict markers (e.g. from
 [template updates](#updating-against-template-changes)), listing where they are.
+You can also run this check on its own with `pixi run conflicts`, for example after a
+merge (or with `./scripts/conflicts.sh`, if `pixi.toml` itself has conflicts).
 To temporarily disable them, for example to make a work-in-progress commit, run
 `pixi run hooks off` (and `pixi run hooks on` to re-enable them).
 They run the following Pixi tasks, which you can also run individually:
@@ -468,8 +470,8 @@ pixi run init
 This installs the template repository's own pre-commit hooks, and offers to set Pixi's
 pinning strategy, as described [above](#initialize-local-repository).
 The pre-commit hooks are configured in [`lefthook.yaml`](lefthook.yaml).
-They check for unresolved merge conflict markers, run the following Pixi tasks, and
-then check that the working tree is clean:
+They check for unresolved merge conflict markers (which `pixi run conflicts` also does
+on its own), run the following Pixi tasks, and then check that the working tree is clean:
 
 - `fmt`: format the template test with `ruff format`
 - `lint`: lint the template test with `ruff check`

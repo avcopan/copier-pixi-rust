@@ -9,6 +9,9 @@ version = "0.1.11"
 # Generate a project and run its setup and pre-commit hooks (see tests/)
 test = "pytest"
 # Individual tasks for pre-commit hooks (must be added to lefthook.yaml)
+# Check for merge conflict markers (lefthook.yaml runs the script directly, which also
+# works when pixi.toml itself has conflicts)
+conflicts = "./scripts/conflicts.sh"
 fmt = "ruff format tests"
 lint = "ruff check tests --fix"
 workflows = "actionlint"  # lint the GitHub Actions workflows

@@ -5,11 +5,7 @@ pre-commit:
     - .pixi/
   commands:
     0-conflicts:
-      run: |
-        if git grep -n -E '^(<<<<<<<|>>>>>>>)( |$)'; then
-          echo "Error: unresolved merge conflict markers (listed above)"
-          exit 1
-        fi
+      run: ./scripts/conflicts.sh
 
     1-fmt:
       run: pixi run fmt
