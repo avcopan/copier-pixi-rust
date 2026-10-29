@@ -7,6 +7,8 @@ includes these doc comments as docstrings, so they use Python's (Google) docstri
 
 from typing import Final
 
+__all__ = ["__version__", "greet"]
+
 __version__: Final[str]
 """
 The package version.
