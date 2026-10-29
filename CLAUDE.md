@@ -7,6 +7,8 @@ The repo root has its own tooling that mirrors the generated projects (tbump rel
 Read the relevant section before changing anything.
 This is the Rust counterpart of `../copier-pixi-python`.
 Keep the two consistent when a change applies to both, and read that repo's `CLAUDE.md` too, since its conventions and general pitfalls apply here.
+Open and deferred items for both templates are in `../TODO.md`, which is not in git.
+Update it when you finish an item or find a new one.
 
 ## Workflow
 
