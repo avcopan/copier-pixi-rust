@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+## [0.1.13] - 2026-10-30
 ### Changed
 - The `prefix_channel` question asks for the full channel path, `<owner>/<channel>`, and rejects other values. A bare `<owner>` is not a channel, so publishing to it failed with `HTTP 403: Not authorized`.
 
