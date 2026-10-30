@@ -21,6 +21,7 @@ Use it to test `pixi run copier-update` and releases by hand.
   It also builds the docs (with rustdoc), and the conda package for `plain`.
   Use `pixi run test -k plain` for a faster loop.
 - Releases work as in copier-pixi-python: CHANGELOG, then `pixi run release X.Y.Z`.
+  The user does all pushes and releases: commit and prepare them, but never run `git push` or `pixi run release`.
   README-only changes are not released.
 
 ## Pitfalls
