@@ -26,6 +26,13 @@ Use it to test `pixi run copier-update` and releases by hand.
 
 ## Pitfalls
 
+- Local dependencies (`scripts/local.sh`, `pixi run local start|stop`), checked 2026-10-30 with tetramol and a local automol:
+  - The published dependency goes in `pyproject.toml` (`pixi run add`), plus a `pypi-conda-map` entry if it isn't on conda-forge under that name.
+    Only the `# local:true` line is needed in `pixi.toml` `[dependencies]` (e.g. `automol = { path = "../automol" }`); a `# local:false` line is redundant.
+  - pixi intersects the path dependency with the pyproject bound, so the local checkout's version must satisfy the bound.
+    Bump the version in the dependency's repo before raising the bound.
+  - Until the dependency's new code is released, `pixi run pre-commit` (which runs `local stop` and tests against the published version) fails. Use `pixi run pre-commit-local`.
+  - `start` and `stop` stash and restore `.pixi/` and `pixi.lock` as `.pixi_local_{true,false}*`, seeding `true` from `false` with rsync hardlinks. This worked as designed.
 - pixi-build-python + maturin:
   - `compilers = ["rust"]` must be explicit, or `.rs` edits never trigger a rebuild.
   - Set `extra-input-globs = ["Cargo.lock", "!target/**"]`.

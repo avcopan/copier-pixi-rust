@@ -260,7 +260,7 @@ These configurations go in the
 
 This works exactly as in
 [copier-pixi-python](https://github.com/avcopan/copier-pixi-python#manage-local-dependencies),
-using `# local:true/false` markers in `pixi.toml` and the following tasks.
+using `# local:true` path dependencies in `pixi.toml` and the following tasks.
 ```sh
 pixi run local start    # use local dependencies
 pixi run local stop     # use published dependencies
