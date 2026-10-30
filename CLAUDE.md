@@ -15,7 +15,7 @@ Use it to test `pixi run copier-update` and releases by hand.
 ## Workflow
 
 - Generate a scratch project, including uncommitted template changes:
-  `pixi exec --spec copier copier copy --vcs-ref=HEAD --defaults -d package_name=my_pkg -d description=x -d 'keywords=[test]' -d 'categories=[science]' -d author_name=x -d author_email=x@x.x -d github_org_name=x -d prefix_channel=x <abs path to this repo> <dest>`.
+  `pixi exec --spec copier copier copy --vcs-ref=HEAD --defaults -d package_name=my_pkg -d description=x -d 'keywords=[test]' -d 'categories=[science]' -d author_name=x -d author_email=x@x.x -d github_org_name=x -d prefix_channel=x/x <abs path to this repo> <dest>`.
   Add `-d polars_plugin=true` for the plugin variant.
 - `pixi run test` (`tests/test_template.py`, for both variants, `plain` and `polars`; locally with a warm cache, `plain` takes about 2 min and `polars` about 12 min; in CI, where the variants run in parallel, `plain` takes about 1 min and `polars` 6.5–9 min) generates a project, runs its `pixi run init` and `pixi run pre-commit`, and checks for a clean tree.
   It also builds the docs (with rustdoc), and the conda package for `plain`.

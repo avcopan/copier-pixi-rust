@@ -69,8 +69,8 @@ For `keywords` and `categories`, enter YAML lists such as `[chemistry, graph]` a
 `[science]` (crates.io allows at most 5 of each; categories must be
 [valid slugs](https://crates.io/category_slugs)).
 For `prefix_channel`, enter the prefix.dev channel to publish to (see
-[below](#set-up-publishing)), as `<namespace>` or
-`<namespace>/<channel>`.
+[below](#set-up-publishing)) as `<owner>/<channel>`, the end of its URL
+(`https://prefix.dev/channels/<owner>/<channel>`).
 Answer "yes" to the Polars question if you want to set up a
 [Polars expression plugin](#polars-expression-plugins).
 

@@ -47,7 +47,8 @@ github_org_name:
 
 prefix_channel:
   type: str
-  help: prefix.dev channel (e.g. <namespace> or <namespace>/<channel>)
+  help: prefix.dev channel, as <owner>/<channel> (the end of its URL, https://prefix.dev/channels/<owner>/<channel>)
+  validator: "{% if prefix_channel.count('/') != 1 or prefix_channel.startswith('/') or prefix_channel.endswith('/') %}Enter the channel as <owner>/<channel>, e.g. janedoe/my-channel{% endif %}"
 
 polars_plugin:
   type: bool
