@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `.zed/settings.json`, which sets up Zed to match the pre-commit hooks: format on save with rustfmt and Ruff (which also sorts imports), Clippy checks with all features in rust-analyzer, and ty instead of basedpyright (see "Set Up Zed" in the README)
+
 ## [0.1.13] - 2026-10-30
 ### Changed
 - The `prefix_channel` question asks for the full channel path, `<owner>/<channel>`, and rejects other values. A bare `<owner>` is not a channel, so publishing to it failed with `HTTP 403: Not authorized`.

@@ -50,7 +50,7 @@ pixi global install copier
 ```
 
 Optionally, you can also install [direnv](https://direnv.net/docs/installation.html) to automatically load your environment for you.
-This is also what lets VS Code use the Pixi toolchain (see [below](#set-up-vs-code)).
+This is also what lets VS Code and Zed use the Pixi toolchain (see [below](#set-up-vs-code)).
 
 ### Setup
 
@@ -127,6 +127,24 @@ The Rust toolchain is installed in the Pixi `dev` environment, which VS Code loa
 `.vscode/settings.json` matches the pre-commit hooks: rustfmt and Ruff format on save,
 rust-analyzer checks with Clippy, and pytest runs in the `test` environment.
 Tombi is recommended over Even Better TOML, which flags valid `[lints]` tables as errors.
+
+#### Set Up Zed
+
+If you use Zed, `.zed/settings.json` sets it up to match the pre-commit hooks.
+rustfmt and Ruff format on save (Ruff also sorts imports), rust-analyzer checks with
+Clippy, and ty replaces basedpyright.
+The Rust toolchain is installed in the Pixi `dev` environment, which Zed loads from
+`.envrc` through direnv:
+
+1. **Install [direnv](https://direnv.net/docs/installation.html)** (for example,
+   `pixi global install direnv`).
+2. **Run `direnv allow` once in the project folder**, since Zed does not ask.
+3. **Open the project folder itself in Zed** (`zed <repo_name>`), since Zed only reads
+   the `.zed/settings.json` and `.envrc` of the folders you open.
+
+To format without saving, run `editor: format` from the command palette (`shift-alt-f`
+on Windows, including Zed connected to WSL, `ctrl-shift-i` on Linux, and `cmd-shift-i`
+on macOS).
 
 #### Set Up Publishing
 
