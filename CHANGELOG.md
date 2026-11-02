@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-11-02
+
 ### Added
 
 - `.zed/settings.json`, which sets up Zed to match the pre-commit hooks: format on save with rustfmt and Ruff (which also sorts imports), Clippy checks with all features in rust-analyzer, and ty instead of basedpyright (see "Set Up Zed" in the README)
