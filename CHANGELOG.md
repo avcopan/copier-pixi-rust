@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-11-09
+
 ### Added
 
 - Floors in the `lowest` feature for old transitive packages that break `test-lowest` on Python 3.13 (`typing-extensions >=4.12`, `libstdcxx-ng >=13`), and PyPI wheels only (`no-build = true`), so that unbounded transitive PyPI dependencies don't resolve to ancient source releases.
