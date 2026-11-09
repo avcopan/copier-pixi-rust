@@ -26,6 +26,8 @@ Test `pixi run copier-update` and releases by hand in a real project generated f
 - Local dependencies (`scripts/local.sh`, `pixi run local start|stop`), checked 2026-10-30 with tetramol and a local automol:
   - The published dependency goes in `pyproject.toml` (`pixi run add`), plus a `pypi-conda-map` entry if it isn't on conda-forge under that name.
     Only the `# local:true` line is needed in `pixi.toml` `[dependencies]` (e.g. `automol = { path = "../automol" }`); a `# local:false` line is redundant.
+    The exception is a PyPI-only dependency (`pypi-conda-map` → `false`, e.g. qcdata): it needs both lines in `[pypi-dependencies]`, since nothing else installs it (see the README).
+  - `pixi run local start` runs in the `dev` env, so it fails when the local:false state can't solve (e.g. the bound asks for an unreleased version); `./scripts/local.sh start` works then.
   - pixi intersects the path dependency with the pyproject bound, so the local checkout's version must satisfy the bound.
     Bump the version in the dependency's repo before raising the bound.
   - Until the dependency's new code is released, `pixi run pre-commit` (which runs `local stop` and tests against the published version) fails. Use `pixi run pre-commit-local`.

@@ -168,6 +168,8 @@ setting up your repository.
    [Test PyPI](https://test.pypi.org/), using your package name as the project name
    and the workflow filename `release.yml`.
    If you do not have accounts on these sites yet, create them first.
+   If your project is already on PyPI, add the publisher under the project's `Manage > Publishing` instead, as described [here](https://docs.pypi.org/trusted-publishers/adding-a-publisher/).
+   Then delete any API token secrets that your old workflows used (such as `UV_PUBLISH_TOKEN` or `ANACONDA_API_KEY`) under `Settings > Secrets and variables > Actions`.
 2. **Conda (prefix.dev).**
    Follow
    [these instructions](https://prefix.dev/docs/prefix/channels/access#configure-repository-access)
@@ -187,6 +189,7 @@ setting up your repository.
    pixi run publish-crates
    pixi run -e dev cargo logout
    ```
+   If your crate is already on crates.io, skip this manual publish.
    Once version `0.0.0` of your crate has been published, follow
    [these instructions](https://crates.io/docs/trusted-publishing) to add a GitHub
    publisher under your crate's `Settings`, using the workflow filename `release.yml`.
@@ -291,6 +294,7 @@ using `# local:true` path dependencies in `pixi.toml` and the following tasks.
 pixi run local start    # use local dependencies
 pixi run local stop     # use published dependencies
 ```
+See there also for PyPI-only dependencies, which need `# local:false` and `# local:true` lines in `[pypi-dependencies]`, and for running `./scripts/local.sh start` directly when `pixi run local start` can't solve.
 
 #### Run Pre-Commit Hooks
 
@@ -326,6 +330,11 @@ They run the following Pixi tasks, which you can also run individually:
 
 The hooks end by checking that the working tree is clean, so they fail if, for example,
 the committed type stub is out of date (just commit the updated files).
+
+**Floors for `test-lowest`.**
+The lowest solve also picks the oldest versions of transitive dependencies, and some of these are too old to work, because a package depends on them without an adequate lower bound.
+If `test-lowest` fails for this reason, add a floor for the package to `[feature.lowest.constraints]` in `pixi.toml`, or to `[feature.lowest.pypi-options.dependency-overrides]` for a PyPI package, with a comment saying why.
+The floors that the template puts there are examples.
 
 #### Edit Documentation
 
