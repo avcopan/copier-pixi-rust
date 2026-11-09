@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Floors in the `lowest` feature for old transitive packages that break `test-lowest` on Python 3.13 (`typing-extensions >=4.12`, `libstdcxx-ng >=13`), and PyPI wheels only (`no-build = true`), so that unbounded transitive PyPI dependencies don't resolve to ancient source releases.
 - `.claude/rules/dependencies.md`, which tells Claude Code how to bound dependency versions: [SPEC 0](https://scientific-python.org/specs/spec-0000/) lower bounds for run dependencies, no upper bounds without a specific reason, and the newest versions of dev and test tools.
 
 ## [0.1.14] - 2026-11-02
