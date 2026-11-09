@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `.claude/rules/dependencies.md`, which tells Claude Code how to bound dependency versions: [SPEC 0](https://scientific-python.org/specs/spec-0000/) lower bounds for run dependencies, no upper bounds without a specific reason, and the newest versions of dev and test tools.
+
 ## [0.1.14] - 2026-11-02
 
 ### Added

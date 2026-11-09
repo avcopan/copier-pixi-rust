@@ -261,6 +261,9 @@ in the
 These dependencies are then
 [mapped into Conda packages](https://pixi.prefix.dev/latest/build/backends/pixi-build-python/#automatic-pypi-dependency-mapping)
 by Pixi.
+Lower bounds follow [SPEC 0](https://scientific-python.org/specs/spec-0000/), with no upper bounds unless there is a specific reason, and dev tools stay at their newest versions.
+Since `uv add` writes the latest version as the lower bound, lower it afterwards and check with `pixi run test-lowest`.
+These rules are spelled out for Claude Code in [`.claude/rules/dependencies.md`](template/.claude/rules/dependencies.md).
 
 #### Manage Dev Dependencies
 
