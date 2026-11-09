@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- `pixi run init` also sets up a clone of an existing project: in a directory that is already a Git repository, it skips `git init` and the initial commit (which used to commit any uncommitted changes) and doesn't print the commands for adding a remote
+
 ## [0.1.15] - 2026-11-09
 
 ### Added

@@ -92,13 +92,18 @@ This does the following:
 
 - Installs all Pixi environments (which builds your package for the first time and
   creates the `Cargo.lock` file)
-- Creates a Git repository with an initial commit, and installs the [Git hooks](#run-pre-commit-hooks)
+- Creates a Git repository (unless the project already is one) and installs the [Git hooks](#run-pre-commit-hooks)
 - Asks whether to set some of your global configurations, such as Pixi's
   [pinning strategy](https://pixi.prefix.dev/latest/reference/pixi_configuration/#pinning-strategy)
   and Git's [merge tool](https://git-scm.com/docs/git-mergetool)
-- Prints the commands to push your project to GitHub
+- Prints the commands to push your project to GitHub (for a new project)
 
-Then complete the following steps.
+**Existing projects.**
+`pixi run init` also sets up a clone of an existing project, for example when you start contributing to one.
+It then skips the Git steps, leaving your history and any uncommitted changes alone, and you can skip the steps below.
+So a project's `CONTRIBUTING.md` only needs to say to run `pixi run init`.
+
+For a new project, complete the following steps.
 
 1. **Push to GitHub.**
    Run the commands printed at the end, which add your GitHub repository as a remote and push to it.
