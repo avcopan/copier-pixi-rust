@@ -71,6 +71,8 @@ For `keywords` and `categories`, enter YAML lists such as `[chemistry, graph]` a
 For `prefix_channel`, enter the prefix.dev channel to publish to (see
 [below](#set-up-publishing)) as `<owner>/<channel>`, the end of its URL
 (`https://prefix.dev/channels/<owner>/<channel>`).
+A primary channel, which prefix.dev staff create on request, has no owner part: enter it as `<channel>`.
+Your username or organization name alone is not a channel, and publishing to it fails with `HTTP 403: Not authorized`.
 Answer "yes" to the Polars question if you want to set up a
 [Polars expression plugin](#polars-expression-plugins).
 

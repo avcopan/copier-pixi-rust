@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- The `prefix_channel` question also accepts a prefix.dev primary channel, which has no owner part: `<channel>` instead of `<owner>/<channel>`.
+
 ## [0.1.16] - 2026-11-09
 
 ### Changed
