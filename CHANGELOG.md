@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- The release workflow first checks that the version tag is on `main`, and stops otherwise, so that a tag on another branch can't publish a release.
+
 ### Changed
 
 - The `prefix_channel` question also accepts a prefix.dev primary channel, which has no owner part: `<channel>` instead of `<owner>/<channel>`.

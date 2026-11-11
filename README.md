@@ -411,6 +411,7 @@ When the tag is pushed, it triggers the
 [release workflow](template/.github/workflows/release.yml)
 on GitHub Actions, which runs the following jobs:
 
+- `check`: checks that the tag is on `main`, so that a tag on another branch releases nothing
 - `test`: runs the test workflow, so that nothing is published unless the tests pass
 
 - `build-conda`: builds the Conda package with `pixi run build-conda`
