@@ -4,18 +4,3 @@
 mod greet;
 
 pub use greet::greet;
-
-// The Python bindings are only compiled when the `python` feature is enabled.
-#[cfg(feature = "python")]
-mod python;
-{%- if polars_plugin %}
-
-// The Polars expression plugins are only compiled when the `python` feature is enabled.
-#[cfg(feature = "python")]
-mod expressions;
-
-// Polars plugins must use the same memory allocator as Polars itself.
-#[cfg(feature = "python")]
-#[global_allocator]
-static ALLOC: pyo3_polars::PolarsAllocator = pyo3_polars::PolarsAllocator::new();
-{%- endif %}

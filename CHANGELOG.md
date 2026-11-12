@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** the project is now a Cargo workspace with two crates. The Rust library stays in the root (`Cargo.toml`, `src/`), and the Python bindings move into a separate crate, `py-<package_name>/`, which is not published to crates.io. The library no longer has a `python` feature or an optional PyO3 dependency, and the bindings can only use its public API. This is the layout that most Rust libraries with Python bindings use (see "Project Layout" and "The Bindings Crate" in the README). `pixi run copier-update` can't move code you have changed, so migrate an existing project by hand:
+  1. Resolve the conflicts in `Cargo.toml` in favor of the template, then add your own dependencies back: library dependencies under `[dependencies]` in `Cargo.toml`, and those that were optional and part of the `python` feature in `py-<package_name>/Cargo.toml`.
+  2. Move your `src/python.rs` to `py-<package_name>/src/lib.rs` (and `src/expressions.rs` to `py-<package_name>/src/expressions.rs`), keeping the new crate-level lines at the top of the template's `lib.rs`. Replace `crate::` paths by `<package_name>::`, and make every item the bindings use `pub` in the library.
+  3. Remove the `mod python;` and `mod expressions;` lines, the `#[global_allocator]`, and every `#[cfg(feature = "python")]` from `src/lib.rs`.
+  4. Run `pixi run pre-commit`.
+
 ### Added
 
 - The release workflow first checks that the version tag is on `main`, and stops otherwise, so that a tag on another branch can't publish a release.

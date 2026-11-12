@@ -1,0 +1,25 @@
+# The Python bindings of the {{package_name}} library, compiled by maturin into the Python
+# extension module `{{package_name}}._core` (see `tool.maturin` in pyproject.toml)
+[package]
+name = "py-{{package_name}}"
+version.workspace = true
+edition.workspace = true
+description = "Python bindings for {{package_name}}"
+license.workspace = true
+repository.workspace = true
+publish = false  # released as a Python package (PyPI, Conda), not on crates.io
+
+[lib]
+crate-type = ["cdylib"]  # a shared library that Python can load
+
+[dependencies]
+{{package_name}} = { path = ".." }
+# PyO3's experimental-inspect feature lets maturin generate the type stubs (see pixi.toml).
+pyo3 = { version = "0.29", features = ["abi3-py313", "experimental-inspect"] }
+{%- if polars_plugin %}
+pyo3-polars = { version = "0.28", features = ["derive"] }
+polars = { version = "0.55", default-features = false }
+{%- endif %}
+
+[lints]
+workspace = true

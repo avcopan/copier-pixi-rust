@@ -13,7 +13,7 @@ This is primarily for my own development.
 ## Features
 
 - Rust library with Python bindings via [PyO3](https://pyo3.rs/), built by [maturin](https://www.maturin.rs/)
-- Usable both as a Python package and as a plain Rust library (without any Python dependency)
+- A plain Rust library crate (without any Python dependency), with the Python bindings in a separate crate of the same Cargo workspace
 - Optional [Polars expression plugin](https://docs.pola.rs/user-guide/plugins/expr_plugins/) setup
 - Packaging and release for Conda with [Pixi](https://prefix.dev/)
 - Packaging and release for PyPI with [maturin-action](https://github.com/PyO3/maturin-action) and [UV](https://docs.astral.sh/uv/)
@@ -206,14 +206,18 @@ setting up your repository.
 
 #### Where Code Goes
 
-The Rust code lives in [`src/`](template/src/), as for any Rust project:
+The Rust library lives in [`src/`](template/src/), as for any Rust project:
 
 - [`src/lib.rs`](template/src/lib.rs.jinja) defines the public Rust API.
   Its crate documentation is included from `CRATE.md` (see below).
 - [`src/greet.rs`](template/src/greet.rs.jinja) is an example module, including a
   unit test and a doc test.
-- [`src/python.rs`](template/src/python.rs) defines the Python bindings: a
-  `#[pymodule]` named `_core` that wraps Rust functions with `#[pyfunction]`.
+
+The Python bindings are a second crate, in
+[`py-<package_name>/`](template/py-{{package_name}}/) (see [below](#project-layout)):
+
+- [`py-<package_name>/src/lib.rs`](template/py-{{package_name}}/src/lib.rs.jinja)
+  defines a `#[pymodule]` named `_core` that wraps Rust functions with `#[pyfunction]`.
   Their doc comments become the Python docstrings, so they are written in Python's
   (Google) docstring style.
 
@@ -230,13 +234,14 @@ The Python package lives in [`python/<package_name>/`](template/python/{{package
 - [`_core.pyi`](template/python/{{package_name}}/_core.pyi) is a type stub describing
   the compiled module, so that Ty, Great Docs, and editors know its signatures and
   docstrings.
-  It is generated from `src/python.rs` by `pixi run stubs`, which the pre-commit hooks
+  It is generated from the bindings crate by `pixi run stubs`, which the pre-commit hooks
   run for you (see [below](#type-stubs)), so do not edit it by hand.
 - [`py.typed`](template/python/{{package_name}}/py.typed) is an empty marker telling
   type checkers that the package ships type information.
 
-To expose a new Rust function to Python, you therefore (1) write the Rust function,
-(2) wrap it in `src/python.rs`, and (3) re-export it in `__init__.py`.
+To expose a new Rust function to Python, you therefore (1) write the Rust function and
+make it public in `src/lib.rs`, (2) wrap it in `py-<package_name>/src/lib.rs`, and
+(3) re-export it in `__init__.py`.
 The type stub is updated when you commit (or run `pixi run stubs` to update it right
 away).
 
@@ -248,14 +253,12 @@ Rust dependencies can be added or removed with Cargo, which edits
 pixi run -e dev cargo add <dependencies...>
 pixi run -e dev cargo remove <dependencies...>
 ```
-If a dependency is only needed for the Python bindings, make it optional and add it
-to the `python` feature (see [here](#the-python-cargo-feature)), so that the plain
-Rust library does not depend on it:
+If a dependency is only needed for the Python bindings, add it to the bindings crate
+instead (see [here](#project-layout)), so that the Rust library does not depend on it.
+This edits [`py-<package_name>/Cargo.toml`](template/py-{{package_name}}/Cargo.toml.jinja).
 ```sh
-pixi run -e dev cargo add <dependency> --optional
+pixi run -e dev cargo add -p py-<package_name> <dependencies...>
 ```
-Then add `"dep:<dependency>"` to the `python = [...]` list under `[features]` in
-`Cargo.toml`.
 
 #### Manage Python Run Dependencies
 
@@ -317,7 +320,9 @@ To temporarily disable them, for example to make a work-in-progress commit, run
 They run the following Pixi tasks, which you can also run individually:
 
 - `stubs`: generate the type stub of the compiled module (`_core.pyi`) with
-  `maturin generate-stubs`
+  `maturin generate-stubs`.
+  The last hook fails if any hook changed a file, and the `test` workflow runs the same
+  hooks, so CI fails when the committed stub is out of date.
 - `fmt`: format Rust code with `cargo fmt` and Python code with `ruff format`
 - `lint`: lint Rust code with `cargo clippy` (with the
   [pedantic](https://doc.rust-lang.org/clippy/lints.html) lint group, configured in
@@ -359,7 +364,7 @@ The API reference is generated from your package's public Python API, which you 
 organize in its `reference` section (see
 [here](https://posit-dev.github.io/great-docs/user-guide/api-documentation.html)).
 For functions from the compiled module, the descriptions come from the doc comments in
-`src/python.rs`, and the types from `_core.pyi`.
+`py-<package_name>/src/lib.rs`, and the types from `_core.pyi`.
 The links to your GitHub repository come from `[project.urls]` in `pyproject.toml`.
 You can add user guide pages as `.qmd` files in a `user_guide/` directory, as
 described
@@ -553,8 +558,21 @@ This section explains the parts of the setup that are not self-explanatory.
 
 #### Project Layout
 
-The project is a single Rust crate (`Cargo.toml`, `src/`) that is also a Python
-package (`pyproject.toml`, `python/`), following maturin's
+The project is a [Cargo workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html)
+with two crates, plus a Python package:
+
+```
+Cargo.toml             the workspace, and the Rust library crate
+src/                   the Rust library (published to crates.io)
+py-<package_name>/     the Python bindings crate (not published to crates.io)
+  Cargo.toml
+  src/lib.rs           the `_core` Python module
+python/<package_name>/ the Python package, which contains the compiled `_core`
+pyproject.toml         the Python package metadata and the maturin settings
+```
+
+maturin builds the Python package from the bindings crate (`manifest-path` under
+`[tool.maturin]` in `pyproject.toml`), following its
 ["mixed Rust/Python project"](https://www.maturin.rs/project_layout.html#mixed-rustpython-project)
 layout.
 The Python code lives in `python/` rather than in the project root, as
@@ -568,26 +586,39 @@ The compiled Rust code is placed inside the Python package as a private submodul
 This keeps the public API in `__init__.py`, which is also where Polars plugin
 functions need to live (see [below](#polars-expression-plugins)).
 
-#### The `python` Cargo Feature
+#### The Bindings Crate
 
 All Python-specific code and dependencies (PyO3, and pyo3-polars for Polars plugins)
-are behind a [Cargo feature](https://doc.rust-lang.org/cargo/reference/features.html)
-named `python`, which is off by default and enabled by maturin
-(`features = ["python"]` in `pyproject.toml`).
-This has two benefits:
+are in a separate crate, `py-<package_name>`, which depends on the library crate by
+its path.
+This is how most Rust libraries with Python bindings are organized (for example
+[Polars](https://github.com/pola-rs/polars), [rattler](https://github.com/conda/rattler),
+and [tokenizers](https://github.com/huggingface/tokenizers)), and it has these benefits:
 
-- The crate is also a plain Rust library: other Rust crates can depend on it (from
+- The library is a plain Rust crate: other Rust crates can depend on it (from
   crates.io, Git, or a local path) and call `<package_name>::greet` without depending
   on Python at all.
-  This is why `Cargo.toml` builds both a `cdylib` (the Python extension module) and
-  an `rlib` (the Rust library).
+  Its `Cargo.toml` does not mention PyO3.
+- The bindings can only use the public API of the library, because they are another
+  crate.
+  So everything that Python can do, other Rust crates can do too.
 - `cargo test` works.
-  If PyO3 were always enabled, the Rust test executables would need to link against
-  `libpython`, which the Python packages from conda-forge do not provide.
-  With the feature off, `cargo test` only builds the plain Rust code, while `pytest`
+  Test executables of a crate that uses PyO3 would need to link against `libpython`,
+  which the Python packages from conda-forge do not provide.
+  In the workspace root, `cargo test` only builds and tests the library, while `pytest`
   tests the Python bindings.
 
-The `lint` task runs Clippy with `--all-features`, so the Python bindings are linted too.
+The bindings crate sets `publish = false`, since it is released as a Python package and
+not on crates.io, and builds a `cdylib`, a shared library that Python can load.
+Both crates share one version (`[workspace.package]` in `Cargo.toml`), one `Cargo.lock`,
+and one set of lints (`[workspace.lints]`).
+The `lint` task runs Clippy with `--workspace`, so the Python bindings are linted too.
+
+One consequence of the two crates is Rust's
+[orphan rule](https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type):
+the bindings crate cannot implement a PyO3 trait for a type of the library, because it
+owns neither.
+Wrap the library type in a type of the bindings crate instead (a "newtype").
 
 #### Type Stubs
 
@@ -596,8 +627,8 @@ comes with a [type stub](https://typing.python.org/en/latest/spec/distributing.h
 `_core.pyi`, which Ty, Great Docs, and editors read instead.
 The stub is generated from the Rust code by
 [PyO3's stub generation](https://pyo3.rs/latest/type-stub.html): the `experimental-inspect`
-feature of PyO3 (enabled in `Cargo.toml`) embeds a description of the module in the
-compiled library, and `maturin generate-stubs` builds the library and writes the stub
+feature of PyO3 (enabled in `py-<package_name>/Cargo.toml`) embeds a description of the
+module in the compiled library, and `maturin generate-stubs` builds the library and writes the stub
 from it, including the doc comments as docstrings.
 The `stubs` task then formats it with `ruff format` (it is excluded from `ruff check`,
 whose rules for hand-written stubs do not apply).
@@ -620,11 +651,11 @@ The Rust library is documented in three places, which all start from `CRATE.md`:
   published to crates.io.
   Its landing page is the crate documentation, which `src/lib.rs` includes from
   `CRATE.md` (`#![doc = include_str!("../CRATE.md")]`).
-  It is built with the default features, so it documents the plain Rust library, without
-  the Python bindings.
+  It documents the Rust library only, since the Python bindings are not published to
+  crates.io.
 - **The documentation site** includes the same API reference, built from the `main`
   branch.
-  `pixi run docs-build` runs `cargo doc` (also without the Python bindings) and copies
+  `pixi run docs-build` runs `cargo doc` (for the library only) and copies
   its output into the site under `rust/`, after Great Docs has built the rest of the
   site.
   The `Rust API` link in the navigation bar comes from
@@ -666,12 +697,13 @@ reliably:
 
 - `abi3 = true` builds against the
   [Python stable ABI](https://docs.python.org/3/c-api/stable.html), together with the
-  `abi3-py313` feature of PyO3 in `Cargo.toml`.
+  `abi3-py313` feature of PyO3 in `py-<package_name>/Cargo.toml`.
   The package is then compatible with every Python version from 3.13 on, so only one
   package needs to be built per platform.
 - `compilers = ["rust"]` adds the Rust compiler to the build.
   The backend would detect this from maturin anyway, but listing it explicitly is what
-  makes Pixi watch the `*.rs` and `Cargo.toml` files and rebuild when they change.
+  makes Pixi watch the `*.rs` and `Cargo.toml` files (of both crates) and rebuild when
+  they change.
   (Without it, Rust changes are silently ignored.)
 - `extra-input-globs = ["Cargo.lock", "!target/**"]` also rebuilds when `Cargo.lock`
   changes, but ignores files generated by Cargo in `target/`, which would otherwise
@@ -709,10 +741,10 @@ registered in the `#[pymodule]`.
 If you answered "yes" to the Polars question, the template adds:
 
 - the [`pyo3-polars`](https://crates.io/crates/pyo3-polars) and `polars` crates as
-  optional dependencies in `Cargo.toml` (part of the `python` feature), and `polars` as a
+  dependencies of the bindings crate (`py-<package_name>/Cargo.toml`), and `polars` as a
   Python dependency in `pyproject.toml`
-- `src/expressions.rs` (in [`src/`](template/src/)), with an example `#[polars_expr]` function `greet_expr`
-- a global memory allocator in `src/lib.rs`, which Polars plugins are required to use
+- `py-<package_name>/src/expressions.rs` (in [`py-<package_name>/src/`](template/py-{{package_name}}/src/)), with an example `#[polars_expr]` function `greet_expr`
+- a global memory allocator in `py-<package_name>/src/lib.rs`, which Polars plugins are required to use
 - `python/<package_name>/_plugins.py` (in [`python/<package_name>/`](template/python/{{package_name}}/)), with a Python function that calls the Rust function through
   [`register_plugin_function`](https://docs.pola.rs/api/python/stable/reference/plugins.html),
   pointing Polars at the package directory (where the compiled library is)
@@ -725,7 +757,7 @@ For more examples, see the
 
 **Keeping versions aligned.**
 `pyo3-polars` depends on specific versions of `pyo3` and `polars`, so these three
-versions must be updated together in `Cargo.toml`.
+versions must be updated together in `py-<package_name>/Cargo.toml`.
 For example, `pyo3-polars` 0.28 requires `pyo3` 0.29 and `polars` 0.55, which is why
 this template uses `pyo3` 0.29 even though newer versions exist.
 

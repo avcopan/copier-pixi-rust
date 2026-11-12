@@ -19,9 +19,9 @@ requires = ["maturin>=1.9,<2"]
 
 # Maturin configurations
 [tool.maturin]
-module-name = "{{package_name}}._core"  # compile the Rust code as a private submodule
+manifest-path = "py-{{package_name}}/Cargo.toml"  # the crate with the Python bindings
+module-name = "{{package_name}}._core"  # compile it as a private submodule
 python-source = "python"                # directory containing the Python package
-features = ["python"]                   # enable the Python bindings (see Cargo.toml)
 editable-profile = "dev"                # fast, unoptimized builds for local development
 
 # Ruff configurations

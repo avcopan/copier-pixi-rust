@@ -1,6 +1,7 @@
 # copier-pixi-rust
 
 A Copier template for Rust libraries with a Python interface (PyO3 + maturin + pixi-build), with an optional Polars plugin.
+A generated project is a Cargo workspace with two crates: the library (root `Cargo.toml`, `src/`, published to crates.io, no PyO3) and the Python bindings (`py-<package_name>/`, `publish = false`, a `cdylib`).
 `template/` (`_subdirectory`) is what gets generated.
 The repo root has its own tooling that mirrors the generated projects (tbump releases, Lefthook hooks, `pixi run init`/`hooks`).
 [`README.md`](README.md) is the reference for how everything works, including the "How It Works" section.
@@ -44,7 +45,7 @@ Test `pixi run copier-update` and releases by hand in a real project generated f
 - Great Docs shows types for compiled functions only from the `.pyi`.
   It shows Parameters/Returns only from Google-style `Args:`/`Returns:` in the `#[pyfunction]` doc comment.
 - Clippy `pedantic` `doc_markdown` rejects bare `snake_case` names in docs (including `CRATE.md`).
-  That's why the test uses `my_pkg`; `src/python.rs` allows it.
+  That's why the test uses `my_pkg`; the bindings crate allows it.
 - PyPI: set `readme` in `pyproject.toml`, because with `[project]` and no `readme`, maturin drops Cargo.toml's readme.
 - CI: `BUILD_EDITABLE_PYTHON: "false"` is set at workflow level.
   Otherwise, a restored setup-pixi cache lacks the gitignored `python/<pkg>/_core.abi3.so`, pixi skips the rebuild, and the import fails.

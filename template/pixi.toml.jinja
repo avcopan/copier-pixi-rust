@@ -99,7 +99,7 @@ great-docs = ">=0.17.0"
 CARGO_TARGET_DIR = "$PIXI_PROJECT_ROOT/target/dev"
 # Build PyO3 as for an extension module, which leaves Python's symbols to the interpreter
 # instead of linking libpython (the Pixi Python ships without it), so that Cargo builds
-# with the `python` feature (`--all-features`, as rust-analyzer's Run buttons use) link
+# of the Python bindings (`--workspace`, as rust-analyzer's Run buttons use) link
 PYO3_BUILD_EXTENSION_MODULE = "1"
 
 [feature.dev.tasks]
@@ -115,11 +115,11 @@ test-lowest = "pixi run -e test-lowest test"
 # Check for merge conflict markers (lefthook.yaml runs the script directly, which also
 # works when pixi.toml itself has conflicts)
 conflicts = "./scripts/conflicts.sh"
-stubs = "maturin generate-stubs --out python && ruff format python/{{package_name}}/_core.pyi"  # see src/python.rs
-fmt = "cargo fmt && ruff format ."
-lint = "cargo clippy --locked --all-targets --all-features -- -D warnings && ruff check . --fix"
+stubs = "maturin generate-stubs --out python && ruff format python/{{package_name}}/_core.pyi"  # see py-{{package_name}}/src/lib.rs
+fmt = "cargo fmt --all && ruff format ."
+lint = "cargo clippy --locked --workspace --all-targets -- -D warnings && ruff check . --fix"
 types = "ty check"
-test-rs = "cargo test --locked"
+test-rs = "cargo test --locked"  # the Rust library (the bindings are tested by pytest)
 workflows = "actionlint"  # lint the GitHub Actions workflows
 # Run pre-commit hooks (see lefthook.yaml)
 pre-commit = "lefthook run pre-commit --all-files"

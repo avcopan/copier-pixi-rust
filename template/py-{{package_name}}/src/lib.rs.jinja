@@ -1,8 +1,22 @@
+//! Python bindings for the `{{package_name}}` library.
+//!
+//! This crate only wraps the public API of the library for Python.
+
 // The docstrings below are Python's (Google style), whose `Args:` entries name
 // parameters without backticks
 #![allow(clippy::doc_markdown)]
+// This crate is not published to crates.io, so it does not need the crates.io metadata
+#![allow(clippy::cargo_common_metadata)]
 
 use pyo3::prelude::*;
+{%- if polars_plugin %}
+
+mod expressions;
+
+// Polars plugins must use the same memory allocator as Polars itself.
+#[global_allocator]
+static ALLOC: pyo3_polars::PolarsAllocator = pyo3_polars::PolarsAllocator::new();
+{%- endif %}
 
 /// The compiled Python module, imported as `<package_name>._core`.
 ///
@@ -26,6 +40,6 @@ mod _core {
     ///     A greeting message.
     #[pyfunction]
     fn greet(name: &str) -> String {
-        crate::greet(name)
+        {{package_name}}::greet(name)
     }
 }
