@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-12
+
 ### Changed
 
 - **Breaking:** the project is now a Cargo workspace with two crates. The Rust library stays in the root (`Cargo.toml`, `src/`), and the Python bindings move into a separate crate, `py-<package_name>/`, which is not published to crates.io. The library no longer has a `python` feature or an optional PyO3 dependency, and the bindings can only use its public API. This is the layout that most Rust libraries with Python bindings use (see "Project Layout" and "The Bindings Crate" in the README). `pixi run copier-update` can't move code you have changed, so migrate an existing project by hand:
