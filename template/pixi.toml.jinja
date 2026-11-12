@@ -69,6 +69,10 @@ no-build = true
 rust = "*"
 # Standard library source, which rust-analyzer needs to resolve `std`
 rust-src = "*"
+{%- if polars_plugin %}
+# C compiler, which some Rust dependencies of Polars need to build
+c-compiler = "*"
+{%- endif %}
 # Type stub generation
 maturin = ">=1.16"  # 1.16 adds `__all__` to the stub
 # Dependency management

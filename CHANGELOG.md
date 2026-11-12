@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   3. Remove the `mod python;` and `mod expressions;` lines, the `#[global_allocator]`, and every `#[cfg(feature = "python")]` from `src/lib.rs`.
   4. Run `pixi run pre-commit`.
 
+### Fixed
+
+- With the Polars plugin, `pixi run stubs` and `pixi run lint` failed on machines without a system C compiler (`failed to find tool "cc"`), because a Rust dependency of Polars compiles C code. The `dev` environment now includes `c-compiler`.
+
 ### Added
 
 - The release workflow first checks that the version tag is on `main`, and stops otherwise, so that a tag on another branch can't publish a release.
