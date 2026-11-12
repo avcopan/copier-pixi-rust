@@ -1,13 +1,43 @@
+use std::error::Error;
+use std::fmt;
+
+/// An error from [`greet`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum GreetError {
+    /// The name is empty.
+    EmptyName,
+}
+
+impl fmt::Display for GreetError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::EmptyName => f.write_str("the name is empty"),
+        }
+    }
+}
+
+impl Error for GreetError {}
+
 /// Greet a person by their name.
+///
+/// # Errors
+///
+/// Returns [`GreetError::EmptyName`] if `name` is empty.
 ///
 /// # Examples
 ///
 /// ```
-/// assert_eq!({{package_name}}::greet("World"), "Hello, World!");
+/// # fn main() -> Result<(), {{package_name}}::GreetError> {
+/// assert_eq!({{package_name}}::greet("World")?, "Hello, World!");
+/// # Ok(())
+/// # }
 /// ```
-#[must_use]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {name}!")
+pub fn greet(name: &str) -> Result<String, GreetError> {
+    if name.is_empty() {
+        return Err(GreetError::EmptyName);
+    }
+    Ok(format!("Hello, {name}!"))
 }
 
 #[cfg(test)]
@@ -16,6 +46,11 @@ mod tests {
 
     #[test]
     fn test_greet() {
-        assert_eq!(greet("Jim"), "Hello, Jim!");
+        assert_eq!(greet("Jim"), Ok("Hello, Jim!".to_string()));
+    }
+
+    #[test]
+    fn test_greet_empty_name() {
+        assert_eq!(greet(""), Err(GreetError::EmptyName));
     }
 }

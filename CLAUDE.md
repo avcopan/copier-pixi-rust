@@ -42,6 +42,12 @@ Test `pixi run copier-update` and releases by hand in a real project generated f
   Anything that links libpython breaks (e.g. pyo3-stub-gen's binary).
 - Stubs come from PyO3 `experimental-inspect` + `maturin generate-stubs`.
   A `#[pymodule_init]` makes the stub incomplete (`__getattr__ -> Incomplete`), so `__version__` uses `#[pymodule_export] const`.
+  `create_exception!` types are also invisible to it and make the stub incomplete, so the exceptions are `#[pyclass(extends = PyException)]` classes.
+  The template's `_core.pyi.jinja` must match what `pixi run stubs` generates for both variants, which differ because of their PyO3 versions (0.30 adds `@disjoint_base`).
+- In `.rs.jinja` files, a line that contains `{{package_name}}` must format the same for any name length, or `cargo fmt` changes a fresh project and `check-clean` fails.
+  Keep such lines short, and don't put `use {{package_name}}::...` in a group with other imports, since rustfmt sorts it by name.
+- `pixi run test` needs several GB of temporary space: where `/tmp` is a small tmpfs, run `TMPDIR=<dir on disk> pixi run test`.
+- The Polars variant needs a C compiler in the `dev` env (`c-compiler`), because a Rust dependency of Polars (`psm`) compiles C code.
 - Great Docs shows types for compiled functions only from the `.pyi`.
   It shows Parameters/Returns only from Google-style `Args:`/`Returns:` in the `#[pyfunction]` doc comment.
 - Clippy `pedantic` `doc_markdown` rejects bare `snake_case` names in docs (including `CRATE.md`).

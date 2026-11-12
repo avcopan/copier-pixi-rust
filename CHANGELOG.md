@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - PyO3 0.30 instead of 0.29 in projects without the Polars plugin. Projects with the plugin stay on 0.29, which `pyo3-polars` 0.28 requires.
 
+- The example function `greet` is now fallible, as an example of error handling: it returns `Result<String, GreetError>` in Rust, and raises `EmptyNameError` (a subclass of the package's new base exception, `Error`) in Python. With the Polars plugin, `greet_expr` fails with a `ComputeError`. See "Python Exceptions" in the README. This only affects new projects, and projects that still have the example.
+
 ### Fixed
 
 - With the Polars plugin, `pixi run stubs` and `pixi run lint` failed on machines without a system C compiler (`failed to find tool "cc"`), because a Rust dependency of Polars compiles C code. The `dev` environment now includes `c-compiler`.

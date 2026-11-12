@@ -1,7 +1,9 @@
 """{{package_name}} tests."""
 {% if polars_plugin %}
 import polars as pl
-{% endif %}
+{%- endif %}
+import pytest
+
 import {{package_name}}
 
 
@@ -13,6 +15,13 @@ def test_stub() -> None:
 def test__greet() -> None:
     """Test the greet function."""
     assert {{package_name}}.greet("World") == "Hello, World!"
+
+
+def test__greet__empty_name() -> None:
+    """Test that greet raises an error for an empty name."""
+    with pytest.raises({{package_name}}.EmptyNameError, match="the name is empty"):
+        {{package_name}}.greet("")
+    assert issubclass({{package_name}}.EmptyNameError, {{package_name}}.Error)
 {%- if polars_plugin %}
 
 
@@ -21,4 +30,11 @@ def test__greet_expr() -> None:
     df = pl.DataFrame({"name": ["World", "Jim"]})
     result = df.select({{package_name}}.greet_expr("name"))
     assert result["name"].to_list() == ["Hello, World!", "Hello, Jim!"]
+
+
+def test__greet_expr__empty_name() -> None:
+    """Test that the greet_expr Polars plugin fails for an empty name."""
+    df = pl.DataFrame({"name": ["World", ""]})
+    with pytest.raises(pl.exceptions.ComputeError, match="the name is empty"):
+        df.select({{package_name}}.greet_expr("name"))
 {%- endif %}

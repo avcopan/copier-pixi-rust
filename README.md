@@ -212,6 +212,8 @@ The Rust library lives in [`src/`](template/src/), as for any Rust project:
   Its crate documentation is included from `CRATE.md` (see below).
 - [`src/greet.rs`](template/src/greet.rs.jinja) is an example module, including a
   unit test and a doc test.
+  Its function returns a `Result` with its own error type, `GreetError`, as an example
+  of error handling.
 
 The Python bindings are a second crate, in
 [`py-<package_name>/`](template/py-{{package_name}}/) (see [below](#project-layout)):
@@ -220,6 +222,8 @@ The Python bindings are a second crate, in
   defines a `#[pymodule]` named `_core` that wraps Rust functions with `#[pyfunction]`.
   Their doc comments become the Python docstrings, so they are written in Python's
   (Google) docstring style.
+  It also shows how to turn the errors of the library into Python exceptions (see
+  [below](#python-exceptions)).
 
 [`CRATE.md`](template/CRATE.md.jinja) is a short description of the Rust library, which
 is both its page on crates.io and the landing page of its API reference (see
@@ -231,7 +235,7 @@ The Python package lives in [`python/<package_name>/`](template/python/{{package
 - [`__init__.py`](template/python/{{package_name}}/__init__.py.jinja) re-exports the
   public functions from the compiled `_core` module.
   Any Python-only code you need can be added next to it.
-- [`_core.pyi`](template/python/{{package_name}}/_core.pyi) is a type stub describing
+- [`_core.pyi`](template/python/{{package_name}}/_core.pyi.jinja) is a type stub describing
   the compiled module, so that Ty, Great Docs, and editors know its signatures and
   docstrings.
   It is generated from the bindings crate by `pixi run stubs`, which the pre-commit hooks
@@ -618,7 +622,27 @@ One consequence of the two crates is Rust's
 [orphan rule](https://doc.rust-lang.org/book/ch10-02-traits.html#implementing-a-trait-on-a-type):
 the bindings crate cannot implement a PyO3 trait for a type of the library, because it
 owns neither.
-Wrap the library type in a type of the bindings crate instead (a "newtype").
+Wrap the library type in a type of the bindings crate instead (a "newtype"), as the
+example does for errors (see the next section).
+
+#### Python Exceptions
+
+The example shows the recommended way to report errors:
+
+- The library returns a `Result` with an error `enum` (`GreetError` in `src/greet.rs`)
+  that implements `Display` and `std::error::Error`, and never panics on bad input.
+- The bindings crate defines the Python exceptions: a base class, `Error`, so that Python
+  code can catch every error of the package with `except <package_name>.Error`, and one
+  subclass per kind of error (`EmptyNameError`).
+- A wrapper type, `PyGreetError`, converts between the two: `From<GreetError>` lets the
+  `?` operator wrap the library's error, and `From<PyGreetError> for PyErr` picks the
+  exception class.
+  A `#[pyfunction]` that returns `Result<T, PyGreetError>` then raises the right exception.
+
+The exceptions are `#[pyclass(extends = PyException)]` classes rather than PyO3's shorter
+[`create_exception!`](https://pyo3.rs/latest/exception.html) macro, because PyO3 cannot
+see the macro's exceptions when it generates the type stub (see [below](#type-stubs)).
+The stub would be marked as incomplete, and the exceptions would be missing from it.
 
 #### Type Stubs
 
