@@ -759,7 +759,7 @@ For more examples, see the
 `pyo3-polars` depends on specific versions of `pyo3` and `polars`, so these three
 versions must be updated together in `py-<package_name>/Cargo.toml`.
 For example, `pyo3-polars` 0.28 requires `pyo3` 0.29 and `polars` 0.55, which is why
-this template uses `pyo3` 0.29 even though newer versions exist.
+this template uses `pyo3` 0.29 with the Polars plugin, and `pyo3` 0.30 without it.
 
 ### Troubleshooting
 

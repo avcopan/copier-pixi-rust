@@ -15,10 +15,14 @@ crate-type = ["cdylib"]  # a shared library that Python can load
 [dependencies]
 {{package_name}} = { path = ".." }
 # PyO3's experimental-inspect feature lets maturin generate the type stubs (see pixi.toml).
-pyo3 = { version = "0.29", features = ["abi3-py313", "experimental-inspect"] }
 {%- if polars_plugin %}
+# pyo3-polars 0.28 requires pyo3 0.29 and polars 0.55: update these three together, once a
+# pyo3-polars release supports a newer pyo3
+pyo3 = { version = "0.29", features = ["abi3-py313", "experimental-inspect"] }
 pyo3-polars = { version = "0.28", features = ["derive"] }
 polars = { version = "0.55", default-features = false }
+{%- else %}
+pyo3 = { version = "0.30", features = ["abi3-py313", "experimental-inspect"] }
 {%- endif %}
 
 [lints]
