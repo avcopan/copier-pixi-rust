@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-13
+
 ### Fixed
 
 - Zed ran pyrefly, pyright and pylsp alongside ty, because the `"..."` in `.zed/settings.json` stood for every Python language server not named in the list, including the ones Zed's own default list turns off. The list is now just `["ty", "ruff"]`.
