@@ -384,10 +384,15 @@ warnings, such as links to items that do not exist.
 
 The project also includes the Great Docs
 [agent skills](https://posit-dev.github.io/great-docs/user-guide/agent-skills.html)
-in `.claude/skills/`, which teach Claude Code how to configure the site, write user
+in `.agents/skills/` (with `.claude/skills` linking to it, since Claude Code only reads `.claude/`), which teach Claude Code how to configure the site, write user
 guide pages, and revise docstrings.
 These are copied from the Great Docs release that this template targets, and are
 updated with the template.
+
+Skills that your dependencies ship (SQLModel, FastAPI, ...) are not vendored.
+After adding such a dependency, run `pixi run skills`
+([library-skills](https://github.com/tiangolo/library-skills)) to link them into `.agents/skills/`.
+The links point into the Pixi environment, so they resolve after `pixi install`.
 A further skill, `rust-review`, reviews Rust code against the
 [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html) and
 the Rust Book's conventions for `use` paths and public APIs, covering what the

@@ -1,5 +1,8 @@
 _subdirectory: template
 
+# .claude/skills is a symlink to ../.agents/skills (Claude Code only reads .claude/)
+_preserve_symlinks: true
+
 _message_after_copy: |
   Your project has been created in {{ _copier_conf.dst_path }}.
   Next, set up your GitHub repository as described here:

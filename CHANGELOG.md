@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- The vendored agent skills (including `rust-review`) live in `.agents/skills/` (the agent-neutral location), and `.claude/skills` is a symlink to it (`_preserve_symlinks: true` in `copier.yml`), because Claude Code only reads `.claude/`. Ruff excludes `.agents` as well as `.claude`
+
+### Added
+
+- `pixi run skills` (`uvx library-skills --all --yes`) links the agent skills that your dependencies ship (SQLModel, FastAPI, ...) into `.agents/skills/`. With the symlink there is one set of links, so the `--claude` flag is not needed
+
+### Migration
+
+Before `copier update` (copier cannot replace a real `.claude/skills` folder with the symlink):
+
+1. If the project has skill links of its own in `.claude/skills/` (such as `sqlmodel`), note them.
+2. `git rm -r .claude/skills` and commit.
+3. Run `pixi run copier-update`. It deletes the new skill files through the symlink, so restore them by copying `template/.agents/skills` from the template clone into `.agents/skills/`.
+4. Run `pixi run skills` to recreate the dependency skill links (or recreate them by hand), and commit.
+
 ## [0.2.1] - 2026-11-13
 
 ### Fixed
