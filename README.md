@@ -390,9 +390,13 @@ These are copied from the Great Docs release that this template targets, and are
 updated with the template.
 
 Skills that your dependencies ship (SQLModel, FastAPI, ...) are not vendored.
-After adding such a dependency, run `pixi run skills`
-([library-skills](https://github.com/tiangolo/library-skills)) to link them into `.agents/skills/`.
-The links point into the Pixi environment, so they resolve after `pixi install`.
+To use one, link it into `.agents/skills/` by hand and commit the link, e.g. for SQLModel:
+```sh
+ln -s ../../.pixi/envs/default/lib/python3.X/site-packages/sqlmodel/.agents/skills/sqlmodel .agents/skills/sqlmodel
+```
+The link points into the Pixi environment, so it resolves after `pixi install`.
+Its path names the Python minor version, so update it after a Python upgrade.
+[library-skills](https://github.com/tiangolo/library-skills) can't make these links in a Pixi project: it finds a copy of each skill in every environment under `.pixi/` and skips them all as name collisions.
 A further skill, `rust-review`, reviews Rust code against the
 [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/checklist.html) and
 the Rust Book's conventions for `use` paths and public APIs, covering what the

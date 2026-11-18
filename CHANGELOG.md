@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+
+- The `pixi run skills` task (`uvx library-skills --all --yes`). It cannot link skills in a Pixi project: the project is installed in editable mode, so library-skills also searches the project tree, finds a copy of each skill in every environment under `.pixi/`, skips them all as name collisions, and deletes existing links into another environment as orphaned. Link dependency skills by hand instead (see the README)
+
 ## [0.2.2] - 2026-11-18
 
 ### Changed
@@ -23,7 +27,7 @@ Before `copier update` (copier cannot replace a real `.claude/skills` folder wit
 1. If the project has skill links of its own in `.claude/skills/` (such as `sqlmodel`), note them.
 2. `git rm -r .claude/skills` and commit.
 3. Run `pixi run copier-update`. It deletes the new skill files through the symlink, so restore them by copying `template/.agents/skills` from the template clone into `.agents/skills/`.
-4. Run `pixi run skills` to recreate the dependency skill links (or recreate them by hand), and commit.
+4. Links that were tracked in `.agents/skills/` survive the update. Recreate the others by hand (`ln -s ../../.pixi/envs/default/lib/python3.X/site-packages/<pkg>/.agents/skills/<pkg> .agents/skills/<pkg>`), and commit. Don't use `pixi run skills`: it was removed in the next release, because it deletes such links (see there).
 
 ## [0.2.1] - 2026-11-13
 
