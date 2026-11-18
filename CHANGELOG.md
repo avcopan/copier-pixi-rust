@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-18
+
 ### Changed
 
 - The vendored agent skills (including `rust-review`) live in `.agents/skills/` (the agent-neutral location), and `.claude/skills` is a symlink to it (`_preserve_symlinks: true` in `copier.yml`), because Claude Code only reads `.claude/`. Ruff excludes `.agents` as well as `.claude`
