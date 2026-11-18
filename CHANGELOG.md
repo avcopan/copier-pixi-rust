@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-11-18
+
 ### Removed
 
 - The `pixi run skills` task (`uvx library-skills --all --yes`). It cannot link skills in a Pixi project: the project is installed in editable mode, so library-skills also searches the project tree, finds a copy of each skill in every environment under `.pixi/`, skips them all as name collisions, and deletes existing links into another environment as orphaned. Link dependency skills by hand instead (see the README)
