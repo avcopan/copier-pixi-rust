@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-11-23
+
 ### Changed
 
 - `UV_NO_SYNC=1` in the `dev` environment, so `pixi run add`, `pixi run remove` and `pixi run uv ...` only update `pyproject.toml` and `uv.lock` and no longer sync a `.venv` in the project root. A stray `.venv` made great-docs run Quarto with it (it prefers `.venv/bin/python`), which broke `pixi run docs-build` (`No module named 'pygments'`). Delete an existing `.venv` after updating
