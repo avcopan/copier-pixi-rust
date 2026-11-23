@@ -124,6 +124,9 @@ fmt = "cargo fmt --all && ruff format ."
 lint = "cargo clippy --locked --workspace --all-targets -- -D warnings && ruff check . --fix"
 types = "ty check"
 test-rs = "cargo test --locked"  # the Rust library (the bindings are tested by pytest)
+{% raw -%}
+test-one = { cmd = "cargo test --locked --tests {{ test }} -- --exact --nocapture", args = ["test"] }  # one Rust test by its full path, showing what it prints
+{%- endraw %}
 workflows = "actionlint"  # lint the GitHub Actions workflows
 # Run pre-commit hooks (see lefthook.yaml)
 pre-commit = "lefthook run pre-commit --all-files"

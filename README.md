@@ -335,6 +335,8 @@ They run the following Pixi tasks, which you can also run individually:
 - `workflows`: lint the GitHub Actions workflows with
   [actionlint](https://github.com/rhysd/actionlint)
 - `test-rs`: run Rust unit tests and doc tests with `cargo test`
+- `test-one <test>`: run one Rust test by its full path (e.g. `my_mod::tests::my_test`) and
+  show what it prints, like a script (`cargo test --tests <test> -- --exact --nocapture`)
 - `test`: run Python tests with `pytest`, with the newest compatible dependency versions
 - `test-lowest`: run Python tests with `pytest`, with the lowest versions allowed by your
   dependencies' lower bounds
