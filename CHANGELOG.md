@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `.claude/settings.json` enables the official `rust-analyzer-lsp` Claude Code plugin, and `rust-analyzer` is in the `dev` environment so the plugin finds it on `PATH`. Start Claude Code with the `dev` environment active (see the README, "Set Up Claude Code")
+
 ## [0.2.4] - 2026-11-23
 
 ### Added

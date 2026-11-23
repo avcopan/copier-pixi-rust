@@ -153,6 +153,12 @@ To format without saving, run `editor: format` from the command palette (`shift-
 on Windows, including Zed connected to WSL, `ctrl-shift-i` on Linux, and `cmd-shift-i`
 on macOS).
 
+#### Set Up Claude Code
+
+`.claude/settings.json` enables the official `rust-analyzer-lsp` plugin, which gives Claude Code rust-analyzer's diagnostics and code navigation.
+**Start Claude Code with the `dev` environment active** (`pixi shell -e dev`, or from a terminal where direnv has loaded `.envrc`), since the plugin runs the `rust-analyzer` binary from `PATH` and the `dev` environment provides it.
+**Accept the plugin when Claude Code asks** the first time it opens the project, or install it with `claude plugin install rust-analyzer-lsp@claude-plugins-official`.
+
 #### Set Up Publishing
 
 The [release workflow](#release-new-versions) publishes packages using
