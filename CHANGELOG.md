@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-11-23
+
 ### Added
 
 - `pixi run test-one <test>` runs one Rust test by its full path (e.g. `my_mod::tests::my_test`) and shows what it prints, as `cargo test --locked --tests <test> -- --exact --nocapture`. It covers unit and integration tests, not doctests
